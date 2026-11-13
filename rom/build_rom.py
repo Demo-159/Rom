@@ -109,6 +109,26 @@ def install_tv_play_store(system):
     print("  Play Store: Android TV build", re.search(r"versionName='([^']+)'", badging).group(1), "+", len(pieces) - 1, "splits")
 
 
+def install_tv_gms(system):
+    """Google Play services' Android TV build (rom/prebuilt/GmsCoreTV.apk) in place of the stock
+    13.2 from 2018: that one is too old for the TV Play Store, whose "Sign in" did nothing on the
+    box. Only if Google signed it like the stock one, it runs on 7.1 and is the ARM 32-bit build."""
+    apk = os.path.join(ROM, "prebuilt", "GmsCoreTV.apk")
+    if not os.path.exists(apk):
+        print("  (no GmsCoreTV.apk: keeping the stock Play services)")
+        return
+    stock = os.path.join(system, "priv-app", "PrebuiltGmsCore", "PrebuiltGmsCore.apk")
+    want, got = stock_cert(stock), apk_cert(apk)
+    if not want or got != want:
+        sys.exit(f"GmsCoreTV.apk is not signed like the stock Play services ({got} vs {want}): refusing it")
+    badging = subprocess.run(["aapt", "dump", "badging", apk], capture_output=True, text=True).stdout
+    sdk = int(re.search(r"sdkVersion:'(\d+)'", badging).group(1))
+    if "package: name='com.google.android.gms'" not in badging or sdk > 25 or "native-code: 'armeabi-v7a'" not in badging:
+        sys.exit(f"GmsCoreTV.apk is not Play services for ARM 32-bit that runs on 7.1 (minSdk {sdk})")
+    install_app(system, "priv-app/PrebuiltGmsCore", apk, extract_libs=True)
+    print("  Play services: Android TV build", re.search(r"versionName='([^']+)'", badging).group(1))
+
+
 def stock_cert(apk):
     """The certificate of a v1-signed APK (the stock Play Store's v2 block was stripped in the image)."""
     der = subprocess.run(["unzip", "-p", apk, "META-INF/*.RSA"], capture_output=True).stdout
@@ -189,6 +209,7 @@ def build_system(parts, work):
         install_app(mnt, "app/TizenTube", tt, extract_libs=True)
         # Android TV Play Store, when rom/prebuilt/Phonesky-TV.apk is there (see install_tv_play_store).
         install_tv_play_store(mnt)
+        install_tv_gms(mnt)
         # Stands in for YouTube (same package name) and hands voice search results to TizenTube.
         install_app(mnt, "app/YouTubeBridge", os.path.join(ROM, "prebuilt", "YouTubeBridge.apk"), extract_libs=False)
         # 3. Overlay files (TV features).
