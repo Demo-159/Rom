@@ -135,6 +135,17 @@ El detalle está en la sección 3.
   - **Pendiente probar en la cajita** si la búsqueda por voz de Google manda los resultados a cualquier app que abra `youtube.com` o solo al paquete `com.google.android.youtube.tv`.
   - **Plan B**, si solo funciona con el paquete oficial: una mini app "puente" con el nombre de paquete `com.google.android.youtube.tv`, sin interfaz, que reenvíe cada video o búsqueda a TizenTube. Hay que vigilar que el Play Store no intente "actualizarla".
 
+### 4.8 Privacidad y servicios de Google (aplicado)
+- **Quitado:** actualizaciones de Oranth (`OTAUpgrade`, `AddonsUpdate`), Google Feedback, registradores de fábrica (`ddrtest`, `aml_logcat`) y el root del fabricante. ADB ahora pide autorización en la TV.
+- **Aerial:** no busca actualizaciones (`RomFlags.UPDATES = false`). Solo baja la foto del día de Bing si ese es el fondo elegido; con Colecciones, el salvapantallas usa las fotos de las colecciones. La biblioteca de imágenes de apps (banners) sigue activa.
+- **En el primer arranque** (`rom/magisk/overlay.d/sbin/tv_tune.sh`, se aplica una sola vez y después se respeta lo que cambies):
+  - Ubicación desactivada.
+  - Búsqueda WiFi y Bluetooth "siempre activa" apagada.
+  - Copia de seguridad de Google desactivada.
+  - Animaciones a 0,5×.
+- **Se mantienen:** Play Store, servicios de Google y Play Protect (seguridad).
+- **Paso manual:** el "diagnóstico de uso" de Google no se puede preconfigurar desde la ROM. En el primer arranque: Ajustes → Google → "Uso y diagnóstico" → desactivar.
+
 ## 5. Launcher (pantalla de inicio)
 
 **Decisión: Aerial, modificado a medida e incluido dentro de la ROM.** Reemplaza a GlassTV, que se probó en el emulador y no convenció tanto.

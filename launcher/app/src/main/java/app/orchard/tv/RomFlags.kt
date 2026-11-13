@@ -17,4 +17,10 @@ object RomFlags {
      * ROM Aerial is the system's own home screen, so they would only add background work.
      */
     const val GUARD = false
+
+    /**
+     * Aerial asking its author's site for new versions. A white-label ROM ships its own build; an
+     * update from upstream would replace it and lose the ROM's changes.
+     */
+    const val UPDATES = false
 }

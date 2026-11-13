@@ -90,6 +90,11 @@ object Wallpapers {
     /** ROM "TV": endless themed pictures (Collections), one every few minutes. */
     const val COLLECTIONS = "collections:mix"
     private const val COLLECTION_PICTURE = "collection:current"
+    private const val COLLECTION_KEPT = "collection:kept:"
+
+    /** ROM "TV": the collections' kept pictures, for the photo screensaver while Collections is the wallpaper. */
+    fun collectionPictures(): List<Wallpaper> =
+        Collections.keptPictures().map { Wallpaper(COLLECTION_KEPT + it.name, WallpaperKind.Daily, COLLECTIONS) }
     const val LIVE = "aerial:live"
     const val VIDEOS = "videos:mine"
     const val VIDEO_PREFIX = "video:"
@@ -223,7 +228,7 @@ object Wallpapers {
         rebuildList()
         loadBaked()
         rebuildBackdrop()
-        scope.launch { refreshDaily() }
+        if (wantsDaily()) scope.launch { refreshDaily() }
         scope.launch(Dispatchers.IO) { clearStaleUploads() }
         // Installs from before 1.42 have a baked picture but no copy yet.
         scope.launch(Dispatchers.IO) { keepForLockedBoot() }
@@ -270,6 +275,7 @@ object Wallpapers {
         prefs.edit { putString("selected", id) }
         rebuildBackdrop()
         if (id == COLLECTIONS && Collections.due) nextCollectionPicture()
+        if (wantsDaily()) refreshDailyIfStale()
     }
 
     /**
@@ -358,7 +364,11 @@ object Wallpapers {
     // ---- pictures ----
 
     private fun fileFor(w: Wallpaper): File? = when (w.kind) {
-        WallpaperKind.Daily -> if (w.id == COLLECTION_PICTURE) Collections.current else File(dailyDir, w.id.removePrefix("daily:") + ".jpg")
+        WallpaperKind.Daily -> when {
+            w.id == COLLECTION_PICTURE -> Collections.current
+            w.id.startsWith(COLLECTION_KEPT) -> File(Collections.history, w.id.removePrefix(COLLECTION_KEPT))
+            else -> File(dailyDir, w.id.removePrefix("daily:") + ".jpg")
+        }
         WallpaperKind.Photo -> File(photoDir, w.id.removePrefix("photo:") + ".jpg")
         else -> null
     }
@@ -863,8 +873,11 @@ object Wallpapers {
      * before its network was, is retried as soon as the network connects ([networkCameUp]), or
      * else a few minutes later (issue #129).
      */
+    /** ROM "TV": Bing's photo of the day is fetched only while one is the wallpaper. */
+    private fun wantsDaily() = selectedId == LATEST_DAILY || selectedId.startsWith("daily:")
+
     fun refreshDailyIfStale(networkCameUp: Boolean = false) {
-        if (!started) return
+        if (!started || !wantsDaily()) return
         val since = System.currentTimeMillis() - lastDailyRefresh
         val due = since >= 6 * 60 * 60 * 1000L ||
             (dailyFailed && (networkCameUp || since >= 10 * 60 * 1000L)) ||

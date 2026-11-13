@@ -659,6 +659,8 @@ private fun PhotoSaver(
     val pool = remember(Wallpapers.items) {
         // The owner's own photos when there are any, else the daily ones (issue #27).
         val pictures = Wallpapers.items.filter { it.kind == WallpaperKind.Photo }
+            // ROM "TV": with Collections as the wallpaper, its kept pictures (no Bing needed).
+            .ifEmpty { if (Wallpapers.selectedId == Wallpapers.COLLECTIONS) Wallpapers.collectionPictures() else emptyList() }
             .ifEmpty { Wallpapers.items.filter { it.kind == WallpaperKind.Daily } }
         val rest = (pictures.ifEmpty { Wallpapers.items.filter { it.kind == WallpaperKind.Builtin } }).shuffled()
         if (first == null) rest else listOf(first) + rest.filter { it.id != first.id }

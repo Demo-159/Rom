@@ -146,8 +146,12 @@ object Collections {
 
     val due: Boolean get() = prefs.getLong("slot", Long.MIN_VALUE) != slot() || !current.exists()
 
+    /** The kept pictures, newest first, for the photo screensaver. */
+    fun keptPictures(): List<File> =
+        history.listFiles { f -> f.name.endsWith(".jpg") }?.sortedByDescending { it.name }.orEmpty()
+
     /** The last pictures shown, kept to go on changing without internet. */
-    private val history by lazy { File(dir, "history").apply { mkdirs() } }
+    val history by lazy { File(dir, "history").apply { mkdirs() } }
     private const val HISTORY_MAX = 20
 
     /**

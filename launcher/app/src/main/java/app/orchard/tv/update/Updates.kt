@@ -118,6 +118,7 @@ object Updates {
         maxAgeMs: Long = UpdateCheck.MAX_AGE_MS,
         networkCameUp: Boolean = false,
     ) {
+        if (!app.orchard.tv.RomFlags.UPDATES) return
         checker?.check(force, maxAgeMs, networkCameUp, when {
             force -> "forced"
             networkCameUp -> "network"

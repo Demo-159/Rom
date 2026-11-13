@@ -27,11 +27,21 @@ early)
     echo 0 > /proc/sys/vm/page-cluster
     ;;
 boot)
-    # Faster animations, only on the first boot: later changes in Settings are kept.
+    # Only on the first boot: later changes in Settings are kept.
     if [ "$(settings get global tv_rom_tuned)" != "1" ]; then
+        # Faster animations.
         settings put global window_animation_scale 0.5
         settings put global transition_animation_scale 0.5
         settings put global animator_duration_scale 0.5
+        # Location off: Google services stop working out where the box is (the weather has its city).
+        settings put secure location_providers_allowed -gps
+        settings put secure location_providers_allowed -network
+        settings put secure location_mode 0
+        # No Wi-Fi or Bluetooth scanning while they are off ("always available" scanning).
+        settings put global wifi_scan_always_enabled 0
+        settings put global ble_scan_always_enabled 0
+        # No Google backup running in the background.
+        bmgr enable false
         settings put global tv_rom_tuned 1
     fi
     ;;
