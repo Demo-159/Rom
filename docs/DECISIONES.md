@@ -97,6 +97,19 @@ El detalle está en la sección 3.
 - Animación de arranque (`/system/media/bootanimation.zip`).
 - **Pendiente:** nombre de la ROM y logo. Si el usuario no trae un logo, se diseña uno sencillo con el nombre.
 
+### 4.6 Asistente de Google (solicitado, con límites)
+**Lo que pide el usuario:** un asistente de Google bueno, rápido y moderno.
+
+**Lo que es posible en este equipo:**
+- **Gemini y el Asistente de Google moderno no funcionan en esta cajita.**
+  - Google está reemplazando el Asistente por Gemini desde septiembre de 2026, también en TVs.
+  - Según Google (marzo de 2025), Gemini pide Android 10 o superior y al menos 2 GB de RAM. Esta cajita tiene Android 7.1 y quizá 1 GB.
+- **Lo viable es la búsqueda por voz de Google para Android TV** (la app "Google para Android TV", paquete `com.google.android.katniss`). Permite buscar por voz en YouTube y en otras apps, y abrir apps. No es el asistente conversacional moderno.
+  - **Pendiente comprobar** qué versión instala y funciona hoy en Android 7.1. No hay fuentes recientes sobre esto.
+  - Se ve beneficiada por el cambio 4.1: con la ROM identificada como Android TV, aparece en el Play Store.
+- **Hace falta un control con micrófono.** El control infrarrojo que trae el TX3 Mini no tiene micrófono. Sirve un control Bluetooth o 2.4 GHz con micrófono, como los "air mouse" G10S o G20S.
+- **Choque con el rendimiento:** la app de Google mantiene servicios en segundo plano y consume RAM. Se instala, pero se ajusta para que no se active sola más de lo necesario.
+
 ## 5. Launcher (pantalla de inicio)
 
 **Estado: todavía no se ha elegido.** El launcher del fabricante (`Oranth_Launcher_720P`) se va a reemplazar porque se ve feo.
@@ -166,6 +179,9 @@ La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, as�
   - data: el resto.
 
 ## 9. Pendientes (resumen)
+
+- [ ] Comprobar qué versión de la búsqueda por voz de Google para Android TV funciona en 7.1 (sección 4.6).
+- [ ] Confirmar si el usuario tiene, o va a comprar, un control con micrófono.
 
 - [ ] Elegir launcher, priorizando el más ligero.
 - [x] ~~Decidir si se quitan los servicios de Google~~ → **Se conservan.**
