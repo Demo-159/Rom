@@ -25,6 +25,10 @@ android {
         // see system/DiagLog.kt.
         val diag = project.hasProperty("diag")
         buildConfigField("boolean", "DIAG", diag.toString())
+        // ROM "TV": default weather city until the owner chooses another (empty = guess from the network).
+        buildConfigField("String", "DEFAULT_PLACE", "\"Paillaco\"")
+        buildConfigField("double", "DEFAULT_LAT", "-40.0711")
+        buildConfigField("double", "DEFAULT_LON", "-72.8708")
         if (diag) versionNameSuffix = "-diag"
     }
 

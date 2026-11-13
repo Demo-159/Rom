@@ -1,5 +1,6 @@
 package app.orchard.tv.weather
 
+import app.orchard.tv.BuildConfig
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
@@ -66,6 +67,16 @@ object Weather {
         started = true
         app = context.applicationContext
         prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        // ROM "TV": a default city set at build time, used until the owner picks another one.
+        if (!prefs.contains("lat") && BuildConfig.DEFAULT_PLACE.isNotEmpty()) {
+            prefs.edit {
+                putFloat("lat", BuildConfig.DEFAULT_LAT.toFloat())
+                putFloat("lon", BuildConfig.DEFAULT_LON.toFloat())
+                putString("place", BuildConfig.DEFAULT_PLACE)
+                putBoolean("chosen", true)
+                putBoolean("checked_against_cities", true)
+            }
+        }
         place = prefs.getString("place", null)
         chosen = prefs.getBoolean("chosen", false)
         if (System.currentTimeMillis() - prefs.getLong("fetched_at", 0) < STALE_MS) {
@@ -219,7 +230,7 @@ object Weather {
                 ?.let { Triple(it.lat, it.lon, it.name) }
                 ?: runCatching {
                     val q = URLEncoder.encode(name.trim(), "UTF-8")
-                    val results = JSONObject(get("https://geocoding-api.open-meteo.com/v1/search?name=$q&count=10&language=zh&format=json"))
+                    val results = JSONObject(get("https://geocoding-api.open-meteo.com/v1/search?name=$q&count=10&language=${Locale.getDefault().language.ifBlank { "en" }}&format=json"))
                         .optJSONArray("results")
                     val all = (0 until (results?.length() ?: 0)).map { results!!.getJSONObject(it) }
                     // The most populous of the name, a seat before a village where neither says: GeoNames

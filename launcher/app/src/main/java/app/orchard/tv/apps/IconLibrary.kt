@@ -219,9 +219,17 @@ object IconLibrary {
                     if (CustomIcons.isValidKey(pkg) && safe(path)) put(pkg, listOf(Choice("default", path, "")))
                 }
             }
+        }.let { found ->
+            // ROM "TV": apps that stand in for another one wear its pictures, unless the index has their own.
+            found + ALIASES.mapNotNull { (alias, of) -> found[of]?.takeIf { alias !in found }?.let { alias to it } }
         }
         map to (root.optJSONObject("credits") ?: JSONObject())
     }.getOrNull()
+
+    /** ROM "TV": package → the package whose library pictures it uses. */
+    private val ALIASES = mapOf(
+        "io.gh.reisxd.tizentube.cobalt" to "com.google.android.youtube.tv", // TizenTube Cobalt: YouTube's banner
+    )
 
     /** A path on the site under p/, with a plain file name. */
     private fun safe(path: String): Boolean = path.startsWith("p/") && path.removePrefix("p/").let { n ->
