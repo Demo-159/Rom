@@ -54,6 +54,7 @@ object IconLibrary {
 
     private lateinit var dir: File
     private lateinit var prefs: SharedPreferences
+    private lateinit var assets: android.content.res.AssetManager
 
     /** Package → its pictures, the default first, from the last index read. */
     @Volatile private var index: Map<String, List<Choice>> = emptyMap()
@@ -67,6 +68,7 @@ object IconLibrary {
     fun init(context: Context) {
         if (::dir.isInitialized) return
         dir = File(context.filesDir, "library").apply { mkdirs() }
+        assets = context.applicationContext.assets
         prefs = context.applicationContext.getSharedPreferences("icon_library", Context.MODE_PRIVATE)
         read(File(dir, "index.json").takeIf { it.exists() }?.readText())?.let { (i, c) -> index = i; credits = c }
     }
@@ -132,11 +134,27 @@ object IconLibrary {
      * Changes when the tile's picture or the pick does (a firmware app drawn as Aerial's own tile
      * takes the same picture only once picked). Part of the tile cache's key.
      */
-    fun stamp(pkg: String): Long = (usable(pkg)?.let { it.lastModified() + it.name.hashCode() } ?: 0L) +
+    fun stamp(pkg: String): Long = (usable(pkg)?.let { it.lastModified() + it.name.hashCode() } ?: bundledStamp(pkg)) +
         when (pick(pkg)) { Pick.Own -> 1L; Pick.Library -> 2L; null -> 0L }
 
     /** The app's picture, or null. Off the main thread. */
-    fun load(pkg: String): Bitmap? = usable(pkg)?.let { BitmapFactory.decodeFile(it.path) }
+    fun load(pkg: String): Bitmap? = usable(pkg)?.let { BitmapFactory.decodeFile(it.path) } ?: bundled(pkg)
+
+    /**
+     * ROM "TV": pictures that ship inside Aerial, for apps whose tile must look right from the
+     * first boot, without network (the index may not be reachable yet, or ever).
+     */
+    private val BUNDLED = mapOf(
+        "io.gh.reisxd.tizentube.cobalt" to "rom/youtube_banner.png", // TizenTube Cobalt: YouTube's official banner
+    )
+
+    private fun bundled(pkg: String): Bitmap? {
+        val path = BUNDLED[pkg] ?: return null
+        if (!::assets.isInitialized || !uses(pkg)) return null
+        return runCatching { assets.open(path).use { BitmapFactory.decodeStream(it) } }.getOrNull()
+    }
+
+    private fun bundledStamp(pkg: String): Long = if (pkg in BUNDLED && uses(pkg)) 7L else 0L
 
     /** Called on the main thread when a pick changed or [refresh] brought something new. */
     fun changed() {

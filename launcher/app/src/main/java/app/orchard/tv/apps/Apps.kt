@@ -467,7 +467,7 @@ object AppCatalog {
         val inMemory = synchronized(cache) { cache[pkg] }?.takeIf { it.stamp == stamp && it.width == TileArtFactory.W }
         if (inMemory == null && later) {
             TileDiskCache.readHeader(pkg, TileDiskCache.key(stamp))?.let { (label, tint) ->
-                return AppEntry(pkg, label, ComponentName(pkg, info.name), leanback, !system, placeholder(tint))
+                return AppEntry(pkg, AppNames.of(pkg) ?: label, ComponentName(pkg, info.name), leanback, !system, placeholder(tint))
             }
         }
         val cached = inMemory
@@ -512,6 +512,7 @@ object AppCatalog {
             runCatching { TileDiskCache.write(pkg, TileDiskCache.key(stamp), label, art) }
         }
         val removable = !system
-        return AppEntry(pkg, label, ComponentName(pkg, info.name), leanback, removable, art)
+        // Names typed on the phone page, or the ROM's own (TizenTube is "YouTube"), wherever the entry goes.
+        return AppEntry(pkg, AppNames.of(pkg) ?: label, ComponentName(pkg, info.name), leanback, removable, art)
     }
 }
