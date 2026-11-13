@@ -133,6 +133,8 @@ def build_system(parts, work):
         install_app(mnt, "priv-app/iTvSettings", TV_SETTINGS_APK, extract_libs=False)
         tt = fetch(TIZENTUBE_URL, os.path.join(work, "TizenTube.apk"))
         install_app(mnt, "app/TizenTube", tt, extract_libs=True)
+        # Stands in for YouTube (same package name) and hands voice search results to TizenTube.
+        install_app(mnt, "app/YouTubeBridge", os.path.join(ROM, "prebuilt", "YouTubeBridge.apk"), extract_libs=False)
         # 3. Overlay files (TV features).
         overlay = os.path.join(ROM, "overlay", "system")
         for base, _, files in os.walk(overlay):

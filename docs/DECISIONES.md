@@ -133,7 +133,11 @@ El detalle está en la sección 3.
   - TizenTube Cobalt declara que abre los enlaces `youtube.com` / `youtu.be` (`VIEW`) y las búsquedas para reproducir (`MEDIA_PLAY_FROM_SEARCH`). Está comprobado en su `AndroidManifest.xml.jinja2`.
   - **Plan A:** quitar de la ROM el YouTube original (`fast_preinstall/com.google.android.youtube.tv_2.02.08.apk`), así esos enlaces llegan a TizenTube.
   - **Pendiente probar en la cajita** si la búsqueda por voz de Google manda los resultados a cualquier app que abra `youtube.com` o solo al paquete `com.google.android.youtube.tv`.
-  - **Plan B**, si solo funciona con el paquete oficial: una mini app "puente" con el nombre de paquete `com.google.android.youtube.tv`, sin interfaz, que reenvíe cada video o búsqueda a TizenTube. Hay que vigilar que el Play Store no intente "actualizarla".
+  - **Plan B (aplicado de antemano):** `YouTubeBridge` (`rom/bridge`, 12,7 KB). Es una mini app con el nombre de paquete `com.google.android.youtube.tv` que reenvía a TizenTube los videos, las búsquedas y "reproduce… en YouTube".
+    - No tiene ícono, servicios ni receptores, así que no ocupa RAM mientras no se usa.
+    - Usa el `versionCode` máximo, para que el Play Store no intente "actualizarla" con el YouTube oficial.
+    - Su filtro de enlaces tiene prioridad menor que el de TizenTube, así que los enlaces de YouTube abren TizenTube directo, sin preguntar.
+  - Antes era el plan B, si solo funcionaba con el paquete oficial: una mini app "puente" con el nombre de paquete `com.google.android.youtube.tv`, sin interfaz, que reenvíe cada video o búsqueda a TizenTube. Hay que vigilar que el Play Store no intente "actualizarla".
 
 ### 4.8 Privacidad y servicios de Google (aplicado)
 - **Quitado:** actualizaciones de Oranth (`OTAUpgrade`, `AddonsUpdate`), Google Feedback, registradores de fábrica (`ddrtest`, `aml_logcat`) y el root del fabricante. ADB ahora pide autorización en la TV.

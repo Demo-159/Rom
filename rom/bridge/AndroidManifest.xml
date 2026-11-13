@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ROM "TV": stands in for the YouTube app (same package name), so voice search results and
+     YouTube links meant for it open in TizenTube. No launcher entry, no service, no receiver:
+     it takes no memory until something asks for YouTube, and finishes at once. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.youtube.tv">
+    <application android:label="YouTube" android:allowBackup="false" android:hasCode="true">
+        <activity android:name="tv.rom.youtubebridge.Bridge"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:exported="true">
+            <!-- Video links. Lower priority than TizenTube's own filter, so a link sent to
+                 nobody in particular goes straight to TizenTube with no chooser. -->
+            <intent-filter android:priority="-1">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="youtube.com" />
+                <data android:host="www.youtube.com" />
+                <data android:host="m.youtube.com" />
+                <data android:host="youtu.be" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="vnd.youtube" />
+            </intent-filter>
+            <!-- "Play ... on YouTube" and searches. -->
+            <intent-filter>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!-- The YouTube activities other apps name directly. -->
+        <activity-alias android:name="com.google.android.apps.youtube.tv.activity.ShellActivity"
+            android:targetActivity="tv.rom.youtubebridge.Bridge" android:exported="true" />
+        <activity-alias android:name="com.google.android.apps.youtube.tv.cobalt.activity.ShellActivity"
+            android:targetActivity="tv.rom.youtubebridge.Bridge" android:exported="true" />
+        <activity-alias android:name="com.google.android.youtube.tv.activity.ShellActivity"
+            android:targetActivity="tv.rom.youtubebridge.Bridge" android:exported="true" />
+    </application>
+</manifest>
