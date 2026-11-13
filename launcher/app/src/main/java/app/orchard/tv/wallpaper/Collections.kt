@@ -92,6 +92,37 @@ object Collections {
         themes = prefs.getStringSet("themes", null)?.toSet()?.takeIf { it.isNotEmpty() } ?: DEFAULT_THEMES
         minutes = prefs.getInt("minutes", DEFAULT_MINUTES)
         caption = prefs.getString("caption", null)
+        seedStarters()
+    }
+
+    /**
+     * ROM "TV": pictures shipped in the APK (assets/starter), so a TV set up without internet still
+     * has collections from the first start. Copied once into the history the offline rotation uses;
+     * newer downloads push them out in time, like any other picture.
+     */
+    private fun seedStarters() {
+        if (prefs.getBoolean("starters_seeded", false)) return
+        runCatching {
+            val list = org.json.JSONArray(app.assets.open("starter/index.json").bufferedReader().use { it.readText() })
+            for (i in 0 until list.length()) {
+                val o = list.getJSONObject(i)
+                val base = "0000000000${i.toString().padStart(3, '0')}_${o.getString("theme")}"
+                app.assets.open("starter/" + o.getString("file")).use { input ->
+                    File(history, "$base.jpg").outputStream().use { input.copyTo(it) }
+                }
+                File(history, "$base.txt").writeText(o.optString("caption"))
+            }
+            if (!current.exists()) {
+                val pick = history.listFiles { f -> f.name.endsWith(".jpg") && f.nameWithoutExtension.substringAfter('_') in themes }
+                    ?.randomOrNull()
+                if (pick != null) {
+                    pick.copyTo(current, overwrite = true)
+                    caption = File(pick.path.removeSuffix(".jpg") + ".txt").takeIf { it.exists() }?.readText()?.ifBlank { null }
+                    prefs.edit { putString("caption", caption); putString("history_shown", pick.name) }
+                }
+            }
+            prefs.edit { putBoolean("starters_seeded", true) }
+        }.onFailure { Log.w(TAG, "could not copy the starter pictures", it) }
     }
 
     fun toggle(id: String) {
