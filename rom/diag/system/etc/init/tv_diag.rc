@@ -1,0 +1,8 @@
+# ROM "TV" test builds (SELinux permissive): boot diagnostics on screen and on a USB stick.
+service tv_diag /system/bin/sh /system/etc/tv_diag.sh
+    user root
+    oneshot
+    disabled
+
+on post-fs-data
+    start tv_diag

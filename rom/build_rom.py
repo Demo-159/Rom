@@ -23,6 +23,8 @@ TIZENTUBE_URL = "https://github.com/reisxd/TizenTubeCobalt/releases/download/v2.
 AERIAL_APK = os.path.join(ROOT, "launcher", "app", "build", "outputs", "apk", "standard", "release", "app-standard-release.apk")
 TV_SETTINGS_APK = os.path.join(ROM, "prebuilt", "iTvSettings.apk")
 SYSTEM_FILE = "u:object_r:system_file:s0"
+OPEN_ADB = False
+DIAG = False
 
 
 def run(*cmd, **kw):
@@ -207,6 +209,24 @@ def build_system(parts, work):
         strip_modules(mnt)
         # 6. build.prop.
         edit_build_prop(os.path.join(mnt, "build.prop"), os.path.join(ROM, "build.prop.txt"))
+        if DIAG:
+            # Test builds only: boot diagnostics on screen and on a USB stick (rom/diag).
+            diag = os.path.join(ROM, "diag", "system")
+            for base, _, files in os.walk(diag):
+                for f in files:
+                    rel = os.path.relpath(os.path.join(base, f), diag)
+                    dst = os.path.join(mnt, rel)
+                    os.makedirs(os.path.dirname(dst), exist_ok=True)
+                    shutil.copy(os.path.join(base, f), dst)
+                    label(dst)
+        if OPEN_ADB:
+            # Test builds only: ADB over the network with no approval on the TV, to read the log
+            # of a box that does not finish starting.
+            # (ro.* keeps the first value read, so the line is replaced, not added.)
+            bp = os.path.join(mnt, "build.prop")
+            keep = [l for l in open(bp).read().splitlines()
+                    if not l.startswith(("ro.adb.secure=", "service.adb.tcp.port=", "persist.adb.tcp.port="))]
+            open(bp, "w").write("\n".join(keep + ["ro.adb.secure=0", "service.adb.tcp.port=5555", "persist.adb.tcp.port=5555"]) + "\n")
         run("df", "-h", mnt)
     finally:
         run("umount", mnt)
@@ -277,7 +297,13 @@ def refresh_verify(parts):
 def main():
     if os.geteuid() != 0:
         sys.exit("run as root (the system image is mounted)")
-    stock, out = sys.argv[1], sys.argv[2]
+    global OPEN_ADB
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    flags = {a for a in sys.argv[1:] if a.startswith("--")}
+    OPEN_ADB = "--open-adb" in flags
+    global DIAG
+    DIAG = "--diag" in flags
+    stock, out = args[0], args[1]
     for f in (AERIAL_APK, TV_SETTINGS_APK):
         if not os.path.exists(f):
             sys.exit("missing " + f)
@@ -285,7 +311,16 @@ def main():
     parts = os.path.join(work, "parts")
     run(sys.executable, UNPACK, "unpack", stock, parts)
     build_system(parts, work)
-    patch_boot(parts, work)
+    if "--stock-boot" in flags:
+        print("test build: boot left as stock (no Magisk, no boot changes)")
+    else:
+        patch_boot(parts, work)
+    if "--permissive" in flags:
+        # Test builds only: SELinux logs instead of blocking, so the diagnostics can run.
+        boot = os.path.join(parts, "boot.PARTITION")
+        cfg = subprocess.run(["abootimg", "-i", boot], capture_output=True, text=True).stdout
+        cmdline = re.search(r"cmdline = (.*)", cfg).group(1).strip()
+        run("abootimg", "-u", boot, "-c", f"cmdline={cmdline} androidboot.selinux=permissive")
     run(sys.executable, os.path.join(ROM, "tools", "logo_black.py"), os.path.join(parts, "logo.PARTITION"))
     refresh_verify(parts)
     run(sys.executable, UNPACK, "repack", parts, out)
