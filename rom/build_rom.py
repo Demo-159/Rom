@@ -64,6 +64,24 @@ def install_app(system, rel_dir, apk, extract_libs):
     label(d)
 
 
+def strip_modules(system):
+    before = after = 0
+    for base, _, files in os.walk(system):
+        for f in files:
+            if not f.endswith(".ko"):
+                continue
+            p = os.path.join(base, f)
+            before += os.path.getsize(p)
+            attr = subprocess.run(["getfattr", "-n", "security.selinux", "--only-values", p], capture_output=True, text=True).stdout
+            subprocess.run(["aarch64-linux-gnu-strip", "--strip-debug", p], check=True)
+            with open(p, "rb") as fh:
+                assert fh.read(4) == b"\x7fELF", p
+            if attr:
+                run("setfattr", "-n", "security.selinux", "-v", attr.strip("\x00"), p)
+            after += os.path.getsize(p)
+    print(f"kernel modules: {before // 2**20} MB -> {after // 2**20} MB", flush=True)
+
+
 def edit_build_prop(path, changes):
     lines = open(path, encoding="utf-8").read().splitlines()
     for raw in open(changes, encoding="utf-8"):
@@ -128,7 +146,10 @@ def build_system(parts, work):
         run(sys.executable, os.path.join(ROM, "tools", "make_bootanim.py"), work)
         shutil.copy(os.path.join(work, "bootanimation.zip"), os.path.join(mnt, "media", "bootanimation.zip"))
         label(os.path.join(mnt, "media", "bootanimation.zip"))
-        # 5. build.prop.
+        # 5. Kernel modules without their debug information (152 MB -> 66 MB). The kernel loads code
+        # and symbols, which stay; the modules are not signed, so nothing checks the bytes.
+        strip_modules(mnt)
+        # 6. build.prop.
         edit_build_prop(os.path.join(mnt, "build.prop"), os.path.join(ROM, "build.prop.txt"))
         run("df", "-h", mnt)
     finally:
@@ -138,6 +159,9 @@ def build_system(parts, work):
     run("tune2fs", "-O", "^has_journal", raw)
     run("tune2fs", "-j", raw)
     fsck(raw)
+    # Blocks freed by the removals still hold old data, which the sparse image would carry
+    # (1.6 GB for 0.9 GB of files). Zeroed, they become empty chunks.
+    run("zerofree", raw)
     run("img2simg", raw, sparse)
     os.remove(raw)
 

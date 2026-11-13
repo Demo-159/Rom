@@ -70,3 +70,7 @@ etc/init/perfprofd.rc
 # Kodi, TizenTube, Netflix and the other video apps bring their own subtitles.
 app/VideoPlayer
 app/SubTitle
+
+# --- Phone ringtones and alarm sounds (7.6 MB); the interface and notification sounds stay
+media/audio/ringtones
+media/audio/alarms
