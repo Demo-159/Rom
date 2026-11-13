@@ -206,7 +206,7 @@ def build_system(parts, work):
         label(os.path.join(mnt, "media", "bootanimation.zip"))
         # 5. Kernel modules without their debug information (152 MB -> 66 MB). The kernel loads code
         # and symbols, which stay; the modules are not signed, so nothing checks the bytes.
-        strip_modules(mnt)
+        # Kernel modules stay as they come: stripped ones failed to load (Wi-Fi 9012p.ko), and they never used RAM for their debug data anyway.
         # 6. build.prop.
         edit_build_prop(os.path.join(mnt, "build.prop"), os.path.join(ROM, "build.prop.txt"))
         if DIAG:

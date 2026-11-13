@@ -10,7 +10,7 @@ Services get "disabled"; "start" lines for them become comments. Usage: boot_ser
 """
 import re, sys
 
-DISABLE = {"ddrtest", "imageserver", "usbpm", "root_access", "sud", "installxbmc", "xbmc_addons"}
+DISABLE = {"ddrtest", "root_access", "sud", "installxbmc", "xbmc_addons"}
 path = sys.argv[1]
 out, changed = [], []
 service = None

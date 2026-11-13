@@ -63,7 +63,6 @@ preinstall/com.netflix.mediaclient-2.apk
 xbmc_preinstall
 
 # --- Services with no use on this box: camera (it has none) and the performance profiler
-etc/init/cameraserver.rc
 etc/init/perfprofd.rc
 
 # --- Amlogic's video player and its subtitle service, which stays in memory all the time.
