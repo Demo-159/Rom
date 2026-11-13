@@ -328,4 +328,31 @@
     <string name="phone_page_channel">Página del celular</string>
     <string name="phone_page_active">Página de configuración activa</string>
     <string name="phone_page_active_hint">Aerial sigue abierto 15 minutos para que funcione la página que escaneaste.</string>
+
+    <!-- ROM "TV": wallpaper collections -->
+    <string name="wp_collections">Colecciones</string>
+    <string name="wp_collections_note">Fotos destacadas de los temas que elijas, una nueva cada poco tiempo. De Wikimedia Commons, con el nombre del autor.</string>
+    <string name="col_every">Cambiar cada</string>
+    <string name="col_every_hint">Cada cuánto aparece otra foto de las colecciones. La siguiente ya está descargada, así que cambia al instante.</string>
+    <string name="col_themes">Temas</string>
+    <string name="col_themes_hint">Marca varios para mezclarlos. Siempre queda al menos uno.</string>
+    <string name="col_space">Espacio</string>
+    <string name="col_ocean">Océano</string>
+    <string name="col_animals">Animales</string>
+    <string name="col_birds">Aves</string>
+    <string name="col_cars">Autos</string>
+    <string name="col_nature">Naturaleza</string>
+    <string name="col_mountains">Montañas</string>
+    <string name="col_forests">Bosques</string>
+    <string name="col_waterfalls">Cascadas</string>
+    <string name="col_beaches">Playas</string>
+    <string name="col_deserts">Desiertos</string>
+    <string name="col_sunsets">Atardeceres</string>
+    <string name="col_auroras">Auroras</string>
+    <string name="col_snow">Nieve</string>
+    <string name="col_cities">Ciudades</string>
+    <string name="col_architecture">Arquitectura</string>
+    <string name="col_aircraft">Aviones</string>
+    <string name="col_trains">Trenes</string>
+    <string name="col_flowers">Flores</string>
 </resources>

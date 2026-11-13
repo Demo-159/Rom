@@ -99,6 +99,7 @@ import app.orchard.tv.wallpaper.ScreensaverMode
 import app.orchard.tv.system.SystemScreensaver
 import app.orchard.tv.wallpaper.Wallpaper
 import app.orchard.tv.wallpaper.WallpaperKind
+import app.orchard.tv.wallpaper.Collections
 import app.orchard.tv.wallpaper.Wallpapers
 import app.orchard.tv.weather.Weather
 import app.orchard.tv.weather.WeatherKind
@@ -191,6 +192,21 @@ fun WallpaperSheet(
                         listOf(false to R.string.st_play_still, true to R.string.st_play_always),
                         AerialSettings.wallpaperAlwaysMoves, AerialSettings::chooseWallpaperAlwaysMoves, first = true,
                     )
+                }
+                // ROM "TV": the collections' themes and how often the picture changes.
+                if (Wallpapers.selectedId == Wallpapers.COLLECTIONS) Group { note ->
+                    Choices(
+                        R.string.col_every, stringResource(R.string.col_every_hint), note,
+                        Collections.MINUTES.map { m ->
+                            m to when {
+                                m >= AerialSettings.DAY_MINUTES -> stringResource(R.string.st_photo_every_day)
+                                m >= 60 -> stringResource(R.string.kids_h, m / 60)
+                                else -> stringResource(R.string.kids_m, m)
+                            }
+                        },
+                        Collections.minutes, { Collections.chooseMinutes(it); Wallpapers.rotateIfDue() }, first = true,
+                    )
+                    ThemeChoices(note)
                 }
                 // Only for "My Photos, in turn": how often the next photo comes (issue #1314).
                 if (Wallpapers.selectedId == Wallpapers.ROTATE_PHOTOS) Group { note ->
@@ -437,13 +453,16 @@ private fun WallpaperRows(takeFocus: Boolean) {
     val dailyTitle = stringResource(R.string.wp_daily_latest)
     val rotateTitle = stringResource(R.string.wp_photos_rotate)
     val videosTitle = stringResource(R.string.wp_videos_rotate)
-    val list = remember(items, selected, dailyTitle, rotateTitle, videosTitle) {
+    val collectionsTitle = stringResource(R.string.wp_collections)
+    val list = remember(items, selected, dailyTitle, rotateTitle, videosTitle, collectionsTitle) {
         buildList {
             addAll(items.filter { it.kind == WallpaperKind.Live })
             // Each video on its own, and with two or more one card that plays them in turn (#762).
             val videos = items.filter { it.kind == WallpaperKind.Video && it.id != Wallpapers.VIDEOS }
             if (videos.size > 1 || selected == Wallpapers.VIDEOS) add(Wallpaper(Wallpapers.VIDEOS, WallpaperKind.Video, videosTitle))
             addAll(videos)
+            // ROM "TV": endless themed pictures, first among the pictures.
+            add(Wallpaper(Wallpapers.COLLECTIONS, WallpaperKind.Daily, collectionsTitle))
             if (items.any { it.kind == WallpaperKind.Daily }) add(Wallpaper(Wallpapers.LATEST_DAILY, WallpaperKind.Daily, dailyTitle))
             addAll(items.filter { it.kind == WallpaperKind.Daily && it.id == selected })
             val photos = items.filter { it.kind == WallpaperKind.Photo }
@@ -488,6 +507,7 @@ private fun wallpaperNote(wp: Wallpaper): String? = when {
     wp.id == Wallpapers.VIDEOS -> stringResource(R.string.wp_videos_note)
     wp.kind == WallpaperKind.Video -> stringResource(R.string.wp_video_note)
     wp.kind == WallpaperKind.Source -> stringResource(R.string.wp_source_note)
+    wp.id == Wallpapers.COLLECTIONS -> stringResource(R.string.wp_collections_note)
     wp.id == Wallpapers.LATEST_DAILY -> stringResource(R.string.wp_daily_note)
     wp.id == Wallpapers.ROTATE_PHOTOS -> stringResource(R.string.wp_photos_rotate_note)
     wp.kind == WallpaperKind.Photo -> stringResource(R.string.wp_photo_note)
@@ -638,6 +658,28 @@ private fun <T> Choices(
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             options.forEach { (value, text) ->
                 Chip(if (text is Int) stringResource(text) else text.toString(), on = current == value) { choose(value) }
+            }
+        }
+    }
+}
+
+/** ROM "TV": the collections' themes, ticked on and off, several at once, wrapping onto more lines. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun ThemeChoices(note: (String?) -> Unit) {
+    val hint = stringResource(R.string.col_themes_hint)
+    Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp)) {
+        BasicText(stringResource(R.string.col_themes), style = Type.Body)
+        Spacer(Modifier.height(10.dp))
+        androidx.compose.foundation.layout.FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Collections.THEMES.forEach { theme ->
+                Chip(stringResource(theme.label), on = theme.id in Collections.themes, onFocused = { note(hint) }) {
+                    Collections.toggle(theme.id)
+                    Wallpapers.nextCollectionPicture(force = true)
+                }
             }
         }
     }

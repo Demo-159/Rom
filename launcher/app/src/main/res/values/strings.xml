@@ -327,4 +327,31 @@
     <string name="phone_page_channel">Phone page</string>
     <string name="phone_page_active">Phone page is on</string>
     <string name="phone_page_active_hint">Aerial stays open for 15 minutes so the page you scanned keeps working.</string>
+
+    <!-- ROM "TV": wallpaper collections -->
+    <string name="wp_collections">Collections</string>
+    <string name="wp_collections_note">Featured photos of the themes you pick, a new one every little while. From Wikimedia Commons, with the author\'s name.</string>
+    <string name="col_every">Change Every</string>
+    <string name="col_every_hint">How often another photo of the collections comes. The next one is already downloaded, so it changes at once.</string>
+    <string name="col_themes">Themes</string>
+    <string name="col_themes_hint">Tick several to mix them. At least one stays on.</string>
+    <string name="col_space">Space</string>
+    <string name="col_ocean">Ocean</string>
+    <string name="col_animals">Animals</string>
+    <string name="col_birds">Birds</string>
+    <string name="col_cars">Cars</string>
+    <string name="col_nature">Nature</string>
+    <string name="col_mountains">Mountains</string>
+    <string name="col_forests">Forests</string>
+    <string name="col_waterfalls">Waterfalls</string>
+    <string name="col_beaches">Beaches</string>
+    <string name="col_deserts">Deserts</string>
+    <string name="col_sunsets">Sunsets</string>
+    <string name="col_auroras">Auroras</string>
+    <string name="col_snow">Snow</string>
+    <string name="col_cities">Cities</string>
+    <string name="col_architecture">Architecture</string>
+    <string name="col_aircraft">Aircraft</string>
+    <string name="col_trains">Trains</string>
+    <string name="col_flowers">Flowers</string>
 </resources>

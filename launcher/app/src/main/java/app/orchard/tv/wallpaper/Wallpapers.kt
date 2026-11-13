@@ -85,6 +85,9 @@ object Wallpapers {
     private const val POSTER_H = 540
     const val AUTO = "auto"
     const val ROTATE_PHOTOS = "photos:rotate"
+    /** ROM "TV": endless themed pictures (Collections), one every few minutes. */
+    const val COLLECTIONS = "collections:mix"
+    private const val COLLECTION_PICTURE = "collection:current"
     const val LIVE = "aerial:live"
     const val VIDEOS = "videos:mine"
     const val VIDEO_PREFIX = "video:"
@@ -201,8 +204,9 @@ object Wallpapers {
         if (started) return
         started = true
         app = context.applicationContext
+        Collections.init(app)
         measure(context).let { (w, h) -> screenW = w; screenH = h }
-        selectedId = (prefs.getString("selected", LATEST_DAILY) ?: LATEST_DAILY)
+        selectedId = (prefs.getString("selected", COLLECTIONS) ?: COLLECTIONS) // ROM "TV": collections by default
             // A built-in wallpaper from before the Mac-style set: its nearest one now.
             .let { if (it.startsWith("grad:")) "grad:" + Gradients.currentKey(it.removePrefix("grad:")) else it }
         chosenScreensaver = when (val key = prefs.getString("screensaver", null)) {
@@ -260,6 +264,7 @@ object Wallpapers {
         selectedId = id
         prefs.edit { putString("selected", id) }
         rebuildBackdrop()
+        if (id == COLLECTIONS && Collections.due) nextCollectionPicture()
     }
 
     /**
@@ -288,6 +293,8 @@ object Wallpapers {
     /** The concrete wallpaper the selection points at today. */
     fun resolve(id: String = selectedId): Wallpaper? = when (id) {
         LATEST_DAILY -> items.firstOrNull { it.kind == WallpaperKind.Daily }
+        COLLECTIONS -> if (Collections.current.exists()) Wallpaper(COLLECTION_PICTURE, WallpaperKind.Daily, COLLECTIONS, Collections.caption)
+            else resolve(LATEST_DAILY)
         ROTATE_PHOTOS -> items.filter { it.kind == WallpaperKind.Photo }.sortedBy { it.id }.let { photos ->
             if (photos.isEmpty()) resolve(LATEST_DAILY) else photos[Math.floorMod(photoSlot(), photos.size)]
         }
@@ -315,14 +322,38 @@ object Wallpapers {
      * and each minute while Home is in front.
      */
     fun rotateIfDue() {
-        if (!started || selectedId != ROTATE_PHOTOS || rotatedOn == photoSlot()) return
+        if (!started) return
+        if (selectedId == COLLECTIONS) { if (Collections.due) nextCollectionPicture(); return }
+        if (selectedId != ROTATE_PHOTOS || rotatedOn == photoSlot()) return
         rebuildBackdrop()
+    }
+
+    private var collecting = false
+    /** When a fetch last failed: offline or refused, it waits a while before trying again. */
+    private var collectFailedAt = 0L
+
+    /** ROM "TV": the next picture of the collections now (when due, or when the themes change). */
+    fun nextCollectionPicture(force: Boolean = false) {
+        if (!started || collecting) return
+        if (!force && System.currentTimeMillis() - collectFailedAt < 5 * 60_000L) return
+        collecting = true
+        scope.launch {
+            try {
+                val changed = Collections.advance(screenW)
+                collectFailedAt = if (changed) 0L else System.currentTimeMillis()
+                if (changed && selectedId == COLLECTIONS) {
+                    synchronized(thumbs) { thumbs.remove(COLLECTIONS) }
+                    pictureVersion++
+                    rebuildBackdrop()
+                }
+            } finally { collecting = false }
+        }
     }
 
     // ---- pictures ----
 
     private fun fileFor(w: Wallpaper): File? = when (w.kind) {
-        WallpaperKind.Daily -> File(dailyDir, w.id.removePrefix("daily:") + ".jpg")
+        WallpaperKind.Daily -> if (w.id == COLLECTION_PICTURE) Collections.current else File(dailyDir, w.id.removePrefix("daily:") + ".jpg")
         WallpaperKind.Photo -> File(photoDir, w.id.removePrefix("photo:") + ".jpg")
         else -> null
     }
@@ -399,7 +430,7 @@ object Wallpapers {
         synchronized(thumbs) { thumbs[id] }?.let { return it }
         // A frame kept meanwhile (useLiveFrame) makes this one old: shown, not kept.
         val version = pictureVersion
-        val wp = (if (id == LATEST_DAILY || id == ROTATE_PHOTOS) resolve(id) else items.firstOrNull { it.id == id }) ?: return null
+        val wp = (if (id == LATEST_DAILY || id == ROTATE_PHOTOS || id == COLLECTIONS) resolve(id) else items.firstOrNull { it.id == id }) ?: return null
         val b = when (wp.kind) {
             WallpaperKind.Auto -> Gradients.render(Gradients.autoThumb, 384, 216)
             // Not kept while no frame of the film can be had: the next look tries again (issue #1158).
