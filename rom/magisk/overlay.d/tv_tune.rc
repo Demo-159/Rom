@@ -1,5 +1,15 @@
 # ROM "TV": runs tv_tune.sh with Magisk's rights (Magisk puts overlay.d/sbin in ${MAGISKTMP}).
+
+# Boot diagnostics on a USB stick when Android does not finish starting (tv_diag.sh). Started
+# first, so it also records a boot that stops at the tuning below.
+service tv_diag ${MAGISKTMP}/tv_diag.sh
+    user root
+    seclabel u:r:magisk:s0
+    oneshot
+    disabled
+
 on post-fs-data
+    start tv_diag
     exec u:r:magisk:s0 root root -- ${MAGISKTMP}/tv_tune.sh early ${MAGISKTMP}
 
 service tv_tune_boot ${MAGISKTMP}/tv_tune.sh boot ${MAGISKTMP}

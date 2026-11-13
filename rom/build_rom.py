@@ -252,6 +252,7 @@ def patch_boot(parts, work):
        "add 0644 overlay.d/sbin/stub.xz stub.xz",
        f"add 0644 overlay.d/tv_tune.rc {os.path.join(ov, 'tv_tune.rc')}",
        f"add 0755 overlay.d/sbin/tv_tune.sh {os.path.join(ov, 'sbin', 'tv_tune.sh')}",
+       f"add 0755 overlay.d/sbin/tv_diag.sh {os.path.join(ov, 'sbin', 'tv_diag.sh')}",
        "patch",
        "backup ramdisk.cpio.orig",
        "mkdir 000 .backup",
