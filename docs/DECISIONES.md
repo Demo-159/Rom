@@ -4,7 +4,7 @@ Registro de lo decidido y lo pendiente. Se actualiza en cada paso.
 
 Última actualización: 13 de noviembre de 2026.
 
-**Resumen:** siempre Android (nunca Linux), rendimiento por encima de todo, y la ROM se identifica como Android TV.
+**Resumen:** siempre Android (nunca Linux), rendimiento por encima de todo, la ROM se identifica como Android TV y se conservan los servicios de Google.
 
 ## 1. Equipo y ROM base
 
@@ -43,6 +43,7 @@ Descartado:
 Regla para cualquier decisión: **si una función o un adorno visual cuesta rendimiento, gana el rendimiento.** Consecuencias:
 - **Launcher:** se prefiere el más ligero que cumpla con lo visual. Nada de fondos animados ni en video, que gastan CPU y GPU todo el tiempo. Se usa fondo estático.
 - **Apps:** limpieza agresiva. Se borra todo lo que no sea necesario para arrancar, navegar, ver contenido y usar el Play Store.
+- **Servicios de Google: se conservan** (decisión del usuario). Play Store, Play Services y el inicio de sesión de Google se quedan, aunque gasten RAM. Sí se pueden quitar apps de Google que no sean necesarias, como el sincronizador de Calendario y Contactos, Google Feedback o Google TTS, si no rompen nada.
 - **Servicios:** se desactivan los servicios en segundo plano del fabricante (DLNA, Miracast, actualizaciones OTA de Oranth, LEDs, pruebas de fábrica, etc.).
 - **Animaciones del sistema:** muy rápidas o desactivadas.
 
@@ -52,6 +53,11 @@ Plan técnico, con valores exactos por definir y probar:
   - Ajustar `swappiness` y el zram (hoy 500 MB).
   - Revisar el heap de Dalvik según la RAM real.
   - Evaluar `ro.config.low_ram=true` si el equipo es de 1 GB.
+- **Ajuste automático según la RAM:** el usuario no sabe si su cajita tiene 1 GB o 2 GB. La ROM tiene que funcionar bien en las dos.
+  - El arranque ya elige solo el perfil de hardware: el DTB trae `gxl_p281_1g` y `gxl_p281_2g`.
+  - Se añade un script de arranque, ejecutado desde `init` antes de que arranque Android, que lee la memoria total en `/proc/meminfo` y aplica el perfil que toque:
+    - **1 GB:** modo estricto. `minfree` agresivo, zram más grande, heap de Dalvik más chico y posiblemente `ro.config.low_ram=true`.
+    - **2 GB:** modo equilibrado, con más apps abiertas en segundo plano.
 - **Animaciones:** `window_animation_scale`, `transition_animation_scale` y `animator_duration_scale` en 0,5 o en 0.
 - **Registro del sistema:** reducir el tamaño de `logd` y desactivar trazas de depuración que no hagan falta. ADB como root se mantiene.
 - **Arranque:** quitar apps que se abren solas al iniciar y animación de arranque corta.
@@ -162,10 +168,10 @@ La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, as�
 ## 9. Pendientes (resumen)
 
 - [ ] Elegir launcher, priorizando el más ligero.
-- [ ] Decidir si se quitan los servicios de Google (Play Store y Play Services). Ganan mucha RAM, pero sin ellos no hay Play Store.
+- [x] ~~Decidir si se quitan los servicios de Google~~ → **Se conservan.**
 - [ ] Nombre de la ROM y logo.
 - [ ] Forma de entrega.
 - [ ] Lista final de apps a borrar.
 - [ ] Valores de rendimiento.
 - [ ] Decidir qué hacer con la configuración del sistema.
-- [ ] Confirmar si la cajita del usuario tiene 1 GB o 2 GB de RAM.
+- [x] ~~Confirmar la RAM de la cajita~~ → **No se sabe.** La ROM detecta la RAM sola y se ajusta (sección 3).
