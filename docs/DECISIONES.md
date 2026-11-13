@@ -4,6 +4,8 @@ Registro de lo decidido y lo pendiente. Se actualiza en cada paso.
 
 Última actualización: 13 de noviembre de 2026.
 
+**Resumen:** siempre Android (nunca Linux), rendimiento por encima de todo, y la ROM se identifica como Android TV.
+
 ## 1. Equipo y ROM base
 
 | Dato | Valor |
@@ -28,13 +30,38 @@ Motivos:
 - Compilar AOSP necesita unos 400 GB de disco y muchas horas.
 - Al modificar la original se conservan el kernel, los drivers y el bootloader de fábrica, que ya funcionan en el equipo. Es lo más seguro para no inutilizar la cajita.
 
-Descartado por ahora:
-- **Linux desde cero (CoreELEC / Armbian):** es viable, porque el TX3 Mini está soportado en Linux oficial, pero no es Android y no permite usar apps de Android.
+**Decisión del usuario: la ROM será siempre Android, nunca Linux.**
+
+Descartado:
+- **Linux (CoreELEC / Armbian):** descartado de forma definitiva por decisión del usuario.
 - **Subir a Android 9:** solo se podría adaptando la ROM de otra cajita con S905W, como la X96 Mini. Tiene riesgo de quedarse sin WiFi (hay varias revisiones del chip), de que no arranque y de que vaya lenta con 1 GB de RAM. Queda como experimento aparte, después de terminar la versión 7.1.
 
-## 3. Cambios aprobados en la ROM
+## 3. Prioridad principal: rendimiento máximo
 
-### 3.1 Identificarse como Android TV ✅
+**Decisión del usuario: el rendimiento es la prioridad número uno.** La ROM tiene que ir muy rápida y consumir los mínimos recursos posibles: RAM, CPU y almacenamiento.
+
+Regla para cualquier decisión: **si una función o un adorno visual cuesta rendimiento, gana el rendimiento.** Consecuencias:
+- **Launcher:** se prefiere el más ligero que cumpla con lo visual. Nada de fondos animados ni en video, que gastan CPU y GPU todo el tiempo. Se usa fondo estático.
+- **Apps:** limpieza agresiva. Se borra todo lo que no sea necesario para arrancar, navegar, ver contenido y usar el Play Store.
+- **Servicios:** se desactivan los servicios en segundo plano del fabricante (DLNA, Miracast, actualizaciones OTA de Oranth, LEDs, pruebas de fábrica, etc.).
+- **Animaciones del sistema:** muy rápidas o desactivadas.
+
+Plan técnico, con valores exactos por definir y probar:
+- **Memoria:**
+  - Ajustar el *low memory killer* (`minfree`) para cerrar antes las apps en segundo plano.
+  - Ajustar `swappiness` y el zram (hoy 500 MB).
+  - Revisar el heap de Dalvik según la RAM real.
+  - Evaluar `ro.config.low_ram=true` si el equipo es de 1 GB.
+- **Animaciones:** `window_animation_scale`, `transition_animation_scale` y `animator_duration_scale` en 0,5 o en 0.
+- **Registro del sistema:** reducir el tamaño de `logd` y desactivar trazas de depuración que no hagan falta. ADB como root se mantiene.
+- **Arranque:** quitar apps que se abren solas al iniciar y animación de arranque corta.
+- **Compilación de apps:** las apps del sistema ya vienen precompiladas (62 carpetas `oat`). Hay que mantener la precompilación de las apps que se queden.
+- **Almacenamiento:** liberar espacio en `system` borrando apps. Hoy quedan unos 375 MB libres.
+
+
+## 4. Cambios aprobados en la ROM
+
+### 4.1 Identificarse como Android TV ✅
 **Decisión: la ROM se declarará como dispositivo Android TV.**
 
 - **Problema:** la ROM original no declara las funciones `android.software.leanback` ni `android.hardware.type.television`. Así lo comprobé en `/system/etc/permissions`.
@@ -42,51 +69,49 @@ Descartado por ahora:
 - **Cambio:** añadir un archivo de permisos en `/system/etc/permissions/` que declare las dos funciones.
 - **Efecto esperado:** aparecen las apps de TV en el Play Store, y algunas apps, como YouTube, cambian a su versión para TV, que se maneja mejor con el control remoto.
 
-### 3.2 Quitar apps que sobran ✅
+### 4.2 Quitar apps que sobran ✅
 Lista a confirmar antes de compilar:
 - Apps preinstaladas de `/system/fast_preinstall/` (las apps vietnamitas, entre otras) y Netflix de `/system/preinstall/`.
 - Chrome duplicado: está en `fast_preinstall` y en `/system/app/Chrome`.
-- Apps de prueba o del fabricante: `FactoryTest_oranth`, `Dig`, `LedStatus` y el launcher `Oranth_Launcher_720P`, que se reemplaza (ver 3.5).
+- Apps de prueba o del fabricante: `FactoryTest_oranth`, `Dig`, `LedStatus` y el launcher `Oranth_Launcher_720P`, que se reemplaza (ver sección 5).
 - Hay que revisar las demás, una por una, antes de borrarlas.
 
-### 3.3 Root + ADB ✅
+### 4.3 Root + ADB ✅
 - La ROM ya trae ADB como root activado: `ro.debuggable=1`, `service.adb.root=1`, `ro.adb.secure=0` y ADB por red en el puerto 5555.
 - El `su` que trae (`/system/xbin/su`) solo lo puede usar ADB, no las apps.
 - **Decisión:** root para apps con **Magisk v27.0**, aplicado a `boot.img` desde la PC. El parche se hace replicando su `boot_patch.sh` con `magiskboot` para x86_64. Magisk ya está descargado para hacer pruebas.
 - No hay dm-verity en `/system` (comprobado en `fstab.amlogic`), así que modificar `system` no impide el arranque.
 
-### 3.4 Rendimiento ✅
-- Animaciones más rápidas.
-- Ajustes de memoria pensados para equipos de 1 a 2 GB de RAM.
-- Ajustes en `build.prop`.
+### 4.4 Rendimiento ✅ (prioridad máxima)
+El detalle está en la sección 3.
 
-Los valores exactos están pendientes de definir.
-
-### 3.5 Marca propia ✅ (datos pendientes)
+### 4.5 Marca propia ✅ (datos pendientes)
 - Nombre del modelo y de la versión en `build.prop`.
 - Logo de arranque (partición `logo`, formato `AML_RES`, imagen `bootup`).
 - Animación de arranque (`/system/media/bootanimation.zip`).
 - **Pendiente:** nombre de la ROM y logo. Si el usuario no trae un logo, se diseña uno sencillo con el nombre.
 
-## 4. Launcher (pantalla de inicio)
+## 5. Launcher (pantalla de inicio)
 
 **Estado: todavía no se ha elegido.** El launcher del fabricante (`Oranth_Launcher_720P`) se va a reemplazar porque se ve feo.
 
 ### Requisitos
+- **Consumir lo mínimo de RAM y CPU** (sección 3). Con fondo estático, sin animaciones de fondo.
 - Funcionar en **Android 7.1** (API 25). Varios launchers modernos piden Android 8 o 9.
 - Para meterlo dentro de la ROM, tiene que ser de código abierto con licencia que lo permita. Si no lo es, el usuario lo instala él mismo desde el Play Store.
-- Estilo preferido: **tipo Google TV, sin banner**. Barra superior con buscador y pestañas, fila de "Recomendaciones" en tarjetas, fila de "Tus aplicaciones" en íconos redondos y fondo con olas de luz animadas. Es la maqueta D: https://claude.ai/artifact/X1kyuUFDTHFeStmKi3WTAN
+- Estilo preferido: **tipo Google TV, sin banner**. Barra superior con buscador y pestañas, fila de "Recomendaciones" en tarjetas, fila de "Tus aplicaciones" en íconos redondos y fondo con olas de luz, ahora **estático** por rendimiento. Es la maqueta D: https://claude.ai/artifact/X1kyuUFDTHFeStmKi3WTAN
 - El usuario prefiere **un launcher ya hecho** antes que uno programado desde cero.
 
 ### Candidatos que funcionan en Android 7.1
 | Launcher | Licencia | ¿Se puede meter en la ROM? | Notas |
 |---|---|---|---|
-| Projectivy Launcher | Cerrada (gratis, con funciones de pago) | No: se instala desde el Play Store | Pide Android 6+. Muy personalizable. Necesita el cambio 3.1 para instalarse. |
-| Arc Launcher | GPL-3.0 | Sí | Estilo Apple TV, en español. Se puede dejar preconfigurado con el estilo D (fondo y color de acento). |
-| Aura TV | MIT | Sí | Efecto de vidrio esmerilado y centro de control. En 7.1 pierde "seguir viendo" y las vistas previas. |
-| GlassTV | MIT | Sí | Muy ligero (tiene versión para Android 4.4), reloj grande, en español. |
-| Luncher | MIT | Sí | Organizado por categorías; no está en español. |
-| LTvLauncher / FLauncher | GPL-3.0 | Sí | Más clásicos. |
+| Lite TV Launcher | GPL-3.0 | Sí | **El más ligero:** unos 44 KB de APK y unos 22 MB de RAM, según su autor. Pide Android 5+. Muy simple visualmente. |
+| Luncher | MIT | Sí | Ligero: no pide permisos y arranca al instante. Organizado por categorías; no está en español. |
+| GlassTV | MIT | Sí | Ligero (tiene versión para Android 4.4), reloj grande, en español. |
+| Projectivy Launcher | Cerrada (gratis, con funciones de pago) | No: se instala desde el Play Store | Pide Android 6+. Muy personalizable, pero más pesado que los anteriores. Necesita el cambio 4.1 para instalarse. |
+| Arc Launcher | GPL-3.0 | Sí | Estilo Apple TV, en español. Se puede dejar preconfigurado con el estilo D (fondo y color de acento). Hecho con Flutter: más pesado; usar con fondo estático. |
+| LTvLauncher / FLauncher | GPL-3.0 | Sí | Más clásicos. Hechos con Flutter, más pesados que los nativos. |
+| Aura TV | MIT | Sí | Efecto de vidrio esmerilado y fotos en movimiento: **choca con la prioridad de rendimiento.** En 7.1 pierde "seguir viendo" y las vistas previas. |
 
 Comparativa con capturas: https://claude.ai/artifact/Pkr9ptFZymWPrada1nSWQd
 
@@ -101,7 +126,7 @@ Comparativa con capturas: https://claude.ai/artifact/Pkr9ptFZymWPrada1nSWQd
 
 Se deja siempre un launcher sencillo de respaldo por si el principal falla.
 
-## 5. Configuración del sistema
+## 6. Configuración del sistema
 
 Al usuario no le gusta el apartado de configuración. La ROM trae tres apps distintas: `Settings` (Android de celular), `Settings_oranth` y `iTvSettings` (Amlogic).
 
@@ -109,7 +134,7 @@ Como la ROM está firmada con *test-keys* públicas, se pueden modificar y volve
 
 **Pendiente:** decidir entre retocar la configuración actual o apoyarse en el centro de control del launcher elegido.
 
-## 6. Entrega de la ROM
+## 7. Entrega de la ROM
 
 La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, así que el repositorio guarda solo herramientas, scripts y documentación.
 
@@ -118,7 +143,7 @@ La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, as�
 2. Partes de menos de 100 MB dentro del repositorio.
 3. Script para generarla en la PC del usuario.
 
-## 7. Datos técnicos comprobados
+## 8. Datos técnicos comprobados
 
 - **Desempaquetar y reempaquetar:** `tools/aml_image_unpack.py` desempaqueta y vuelve a empaquetar la imagen **byte a byte idéntica** a la original (comprobado con `cmp`).
   - Cabecera: 0x40 bytes. Cada elemento: 0x240 bytes. Alineación: 4 bytes.
@@ -134,9 +159,10 @@ La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, as�
   - cache: 512 MB.
   - data: el resto.
 
-## 8. Pendientes (resumen)
+## 9. Pendientes (resumen)
 
-- [ ] Elegir launcher.
+- [ ] Elegir launcher, priorizando el más ligero.
+- [ ] Decidir si se quitan los servicios de Google (Play Store y Play Services). Ganan mucha RAM, pero sin ellos no hay Play Store.
 - [ ] Nombre de la ROM y logo.
 - [ ] Forma de entrega.
 - [ ] Lista final de apps a borrar.
