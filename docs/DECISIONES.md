@@ -96,8 +96,14 @@ El detalle está en la sección 3.
 
 - **Nombre visible:** "TV" en *Acerca de*, en el nombre del dispositivo en la red y en Bluetooth, y en el launcher. Se cambian `ro.product.model=TV` y el nombre del dispositivo.
 - **Lo que no se toca:** `ro.build.fingerprint`, `ro.product.name` y `ro.product.device` (`p281`) se quedan como en la original. El Play Store y los servicios de Google usan esos datos; cambiarlos puede romper el inicio de sesión o la compatibilidad de apps.
-- **Logo de arranque** (partición `logo`, imagen `bootup`): neutro, solo "TV" en blanco sobre fondo negro, sin el logo del fabricante.
-- **Animación de arranque** (`/system/media/bootanimation.zip`): neutra y corta, por rendimiento.
+- **Logo de arranque** (partición `logo`, imagen `bootup`). **Decisión del usuario: sin logo.**
+  - El bootloader (u-boot) siempre muestra la imagen `bootup`, así que se reemplaza por una **pantalla negra**. Visualmente no hay logo.
+  - Si una pantalla totalmente negra diera problemas (por ejemplo, que la TV no detecte la señal y parezca apagada), se usa el robot de Android, que tiene licencia libre (CC BY 3.0).
+- **Animación de arranque** (`/system/media/bootanimation.zip`). **Decisión del usuario: que el arranque se parezca al de Google TV.**
+  - Se hace una animación **original con el mismo estilo**: fondo negro, formas simples de colores que aparecen con suavidad y transición limpia al launcher.
+  - **No se usan el logo ni la animación de Google TV**, que son marcas registradas de Google. Tampoco encajan en una ROM de marca blanca.
+  - Por rendimiento: resolución 720p, pocos fotogramas, imágenes comprimidas y duración corta. El tiempo real de arranque no depende de la animación, pero así no consume recursos mientras carga.
+  - Si no convence, el respaldo es la animación estándar de AOSP (el texto "android" con brillo). Viene dentro del sistema y no pesa nada.
 - Se quitan las referencias visibles a Oranth y Tanix en lo que vea el usuario.
 
 ### 4.6 Asistente de Google (solicitado, con límites)
@@ -207,7 +213,7 @@ Opciones que se evaluaron:
 
 - [x] ~~Elegir launcher~~ → **GlassTV modificado.** Falta definir las modificaciones.
 - [x] ~~Decidir si se quitan los servicios de Google~~ → **Se conservan.**
-- [x] ~~Nombre de la ROM y logo~~ → **"TV", marca blanca**, con logo neutro.
+- [x] ~~Nombre de la ROM y logo~~ → **"TV", marca blanca.** Sin logo de arranque (pantalla negra) y animación original al estilo Google TV.
 - [x] ~~Forma de entrega~~ → **Descarga temporal.** Falta elegir el servicio al momento de subir.
 - [ ] Lista final de apps a borrar.
 - [ ] Valores de rendimiento.
