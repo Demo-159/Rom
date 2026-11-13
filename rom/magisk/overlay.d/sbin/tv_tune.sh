@@ -42,7 +42,23 @@ boot)
         settings put global ble_scan_always_enabled 0
         # No Google backup running in the background.
         bmgr enable false
+        # Wi-Fi for Chile: the 5 GHz channels the country allows.
+        settings put global wifi_country_code CL
+        # HDMI-CEC on: the TV turns on and switches to the box with it, and turns off with it.
+        settings put global hdmi_control_enabled 1
+        settings put global hdmi_control_one_touch_play_enabled 1
+        settings put global hdmi_control_auto_device_off_enabled 1
+        settings put global hdmi_control_auto_wakeup_enabled 1
+        # Standby after 3 hours without use (one of the choices in Settings, so it can be changed there).
+        settings put system screen_off_timeout 10800000
         settings put global tv_rom_tuned 1
+    fi
+    # The launcher compiled ahead of time, so it opens and moves fast from the first day; again
+    # whenever a new version of it comes with a ROM update. Low priority, after boot.
+    AERIAL=$(dumpsys package app.orchard.tv | grep -m1 versionCode | sed 's/.*versionCode=\([0-9]*\).*/\1/')
+    if [ -n "$AERIAL" ] && [ "$(settings get global tv_rom_aerial_compiled)" != "$AERIAL" ]; then
+        nice -n 19 cmd package compile -m speed -f app.orchard.tv > /dev/null 2>&1 && \
+            settings put global tv_rom_aerial_compiled "$AERIAL"
     fi
     ;;
 esac

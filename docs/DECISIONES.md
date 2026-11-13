@@ -158,6 +158,12 @@ El detalle está en la sección 3.
   - Los proveedores de datos, que solo se abren cuando alguien los consulta.
 - **Kernel 3.14 sin KSM:** no hay fusión de páginas. La memoria comprimida (zram, 500 MB) ya está activa.
 
+### 4.10 Comodidad (aplicado en el primer arranque, `tv_tune.sh`)
+- **Launcher precompilado:** Aerial se compila por adelantado con `cmd package compile -m speed`, con prioridad baja y después del arranque. Se repite cuando una actualización de la ROM trae otra versión de Aerial. TizenTube no se precompila, por decisión del usuario.
+- **WiFi con código de país Chile (`CL`):** habilita los canales de 5 GHz permitidos en Chile.
+- **HDMI-CEC activado:** la TV se enciende y cambia a la cajita al encenderla, y se apaga con ella.
+- **Apagado automático (suspensión) tras 3 horas sin uso.** Se cambia en Ajustes → Pantalla.
+
 ## 5. Launcher (pantalla de inicio)
 
 **Decisión: Aerial, modificado a medida e incluido dentro de la ROM.** Reemplaza a GlassTV, que se probó en el emulador y no convenció tanto.
