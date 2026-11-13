@@ -1,0 +1,10 @@
+# ROM "TV": memory and speed tuning (tv_tune.sh), once Android has started.
+# Run by init from /system (no Magisk: the boot image stays as stock).
+service tv_tune /system/bin/sh /system/etc/tv_tune.sh
+    user root
+    group root
+    oneshot
+    disabled
+
+on property:sys.boot_completed=1
+    start tv_tune

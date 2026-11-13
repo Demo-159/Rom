@@ -85,7 +85,8 @@ Lista a confirmar antes de compilar:
 ### 4.3 Root + ADB ✅
 - La ROM ya trae ADB como root activado: `ro.debuggable=1`, `service.adb.root=1`, `ro.adb.secure=0` y ADB por red en el puerto 5555.
 - El `su` que trae (`/system/xbin/su`) solo lo puede usar ADB, no las apps.
-- **Decisión:** root para apps con **Magisk v27.0**, aplicado a `boot.img` desde la PC. El parche se hace replicando su `boot_patch.sh` con `magiskboot` para x86_64. Magisk ya está descargado para hacer pruebas.
+- **Cambio (pruebas en la cajita):** con Magisk en `boot.img` la cajita nunca pasó de la animación de arranque, y el root ya no se quiere. Se deja el `boot.img` de fábrica, sin Magisk, con SELinux en modo permisivo (lo que se vio arrancar y funcionar). Los ajustes de memoria y del primer arranque van en `/system/etc/init/tv_tune.rc` y `/system/etc/tv_tune.sh`. Magisk queda como opción `--magisk` del script.
+- **Decisión original (descartada):** root para apps con **Magisk v27.0**, aplicado a `boot.img` desde la PC. El parche se hace replicando su `boot_patch.sh` con `magiskboot` para x86_64. Magisk ya está descargado para hacer pruebas.
 - No hay dm-verity en `/system` (comprobado en `fstab.amlogic`), así que modificar `system` no impide el arranque.
 
 ### 4.4 Rendimiento ✅ (prioridad máxima)
@@ -142,7 +143,7 @@ El detalle está en la sección 3.
 ### 4.8 Privacidad y servicios de Google (aplicado)
 - **Quitado:** actualizaciones de Oranth (`OTAUpgrade`, `AddonsUpdate`), Google Feedback, registradores de fábrica (`ddrtest`, `aml_logcat`) y el root del fabricante. ADB ahora pide autorización en la TV.
 - **Aerial:** no busca actualizaciones (`RomFlags.UPDATES = false`). Solo baja la foto del día de Bing si ese es el fondo elegido; con Colecciones, el salvapantallas usa las fotos de las colecciones. La biblioteca de imágenes de apps (banners) sigue activa.
-- **En el primer arranque** (`rom/magisk/overlay.d/sbin/tv_tune.sh`, se aplica una sola vez y después se respeta lo que cambies):
+- **En el primer arranque** (`rom/overlay/system/etc/tv_tune.sh`, se aplica una sola vez y después se respeta lo que cambies):
   - Ubicación desactivada.
   - Búsqueda WiFi y Bluetooth "siempre activa" apagada.
   - Copia de seguridad de Google desactivada.
@@ -284,3 +285,10 @@ Opciones que se evaluaron:
 - [ ] Valores de rendimiento.
 - [ ] Decidir qué hacer con la configuración del sistema.
 - [x] ~~Confirmar la RAM de la cajita~~ → **No se sabe.** La ROM detecta la RAM sola y se ajusta (sección 3).
+
+## Errores encontrados en la cajita (registros por USB)
+
+- **Se reiniciaba cada ~2 minutos:** se había quitado `cameraserver`. El servicio de Amlogic `BootComplete` (dentro de `system_server`) pregunta por cámaras USB y se quedaba esperando para siempre; el watchdog reiniciaba Android. `cameraserver` vuelve.
+- **El Wi-Fi no funcionaba:** los módulos del kernel recortados con `strip` no cargaban (`Failed to insmod 9012`). Los módulos quedan como vienen de fábrica.
+- **Por precaución,** `usbpm` e `imageserver` (servicios de Amlogic) vuelven a arrancar.
+- **No arrancaba con Magisk:** ver la sección de root; se quitó.

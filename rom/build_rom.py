@@ -8,7 +8,7 @@ Steps, each one described in docs/DECISIONES.md:
   1. unpack the USB Burning Tool image            (tools/aml_image_unpack.py)
   2. system: remove apps, add Aerial, TV settings,
      TizenTube, TV features, boot animation, build.prop
-  3. boot: Magisk (root) plus the memory tuning    (rom/magisk)
+  3. boot: stock, SELinux permissive (--magisk adds root, --enforcing keeps SELinux on)
   4. logo: black
   5. VERIFY sha1 files, repack the image
 """
@@ -204,9 +204,7 @@ def build_system(parts, work):
         run(sys.executable, os.path.join(ROM, "tools", "make_bootanim.py"), work)
         shutil.copy(os.path.join(work, "bootanimation.zip"), os.path.join(mnt, "media", "bootanimation.zip"))
         label(os.path.join(mnt, "media", "bootanimation.zip"))
-        # 5. Kernel modules without their debug information (152 MB -> 66 MB). The kernel loads code
-        # and symbols, which stay; the modules are not signed, so nothing checks the bytes.
-        # Kernel modules stay as they come: stripped ones failed to load (Wi-Fi 9012p.ko), and they never used RAM for their debug data anyway.
+        # 5. Kernel modules stay as they come: stripped ones failed to load (Wi-Fi 9012p.ko), and they never used RAM for their debug data anyway.
         # 6. build.prop.
         edit_build_prop(os.path.join(mnt, "build.prop"), os.path.join(ROM, "build.prop.txt"))
         if DIAG:
@@ -311,12 +309,15 @@ def main():
     parts = os.path.join(work, "parts")
     run(sys.executable, UNPACK, "unpack", stock, parts)
     build_system(parts, work)
-    if "--stock-boot" in flags:
-        print("test build: boot left as stock (no Magisk, no boot changes)")
-    else:
+    # The boot image stays as stock: with Magisk on it this box never got past the boot animation,
+    # and root is not wanted (docs/DECISIONES.md). The tuning runs from /system (etc/init/tv_tune.rc).
+    if "--magisk" in flags:
         patch_boot(parts, work)
-    if "--permissive" in flags:
-        # Test builds only: SELinux logs instead of blocking, so the diagnostics can run.
+    else:
+        print("boot left as stock (no Magisk)")
+    if "--enforcing" not in flags:
+        # SELinux permissive: the setup that was seen to start and run on the box. The tuning and
+        # the USB logs run as init services that the stock policy has no domain for.
         boot = os.path.join(parts, "boot.PARTITION")
         cfg = subprocess.run(["abootimg", "-i", boot], capture_output=True, text=True).stdout
         cmdline = re.search(r"cmdline = (.*)", cfg).group(1).strip()
