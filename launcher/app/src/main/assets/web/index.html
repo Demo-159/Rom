@@ -283,6 +283,12 @@
     .agrid.sorting .atile:not(.lift) { transition: none; }
     .toast { transform: translate(-50%, 0); }
   }
+/* ROM "TV": collections */
+.colrow{display:flex;flex-direction:column;gap:8px;margin:14px 0 4px}
+.collabel{font-size:15px;font-weight:600}
+.colchips{display:flex;flex-wrap:wrap;gap:8px}
+.colchip{font:inherit;font-size:14px;padding:7px 14px;border-radius:999px;border:1px solid var(--separator, #d1d1d6);background:var(--card, #fff);color:inherit;cursor:pointer}
+.colchip[aria-pressed="true"]{background:var(--accent, #0a84ff);border-color:var(--accent, #0a84ff);color:#fff}
 </style>
 </head>
 <body>
@@ -1768,6 +1774,7 @@ function action(list, text, cls, fn) {
 
 /* Wallpaper tab. */
 function titleOf(id) {
+  if (state.collections && id === state.collections.id) return state.collections.title;
   if (id === state.latestDaily) return t('daily_title');
   if (id === state.rotatePhotos) return t('rotate_title');
   const w = state.wallpapers.find(w => w.id === id);
@@ -1806,6 +1813,7 @@ function renderWallpapers() {
   $('#heroImg').src = `${base}thumb/${encodeURIComponent(state.selected)}`;
   $('#heroTitle').textContent = titleOf(state.selected);
   const root = $('#sections'); root.replaceChildren();
+  renderCollections(root);
   for (const [kind, title, sub] of groups) {
     // Moving: the aerial films and the owner's videos.
     let list = state.wallpapers.filter(w => w.kind === kind || (kind === 'live' && w.kind === 'video'));
@@ -1840,6 +1848,35 @@ function renderWallpapers() {
     }
     if (kind === 'photo' && list.length === 1) root.appendChild(el('p', 'foot', t('add_second')));
   }
+}
+/* ROM "TV": wallpaper collections — the card, how often, and the themes to mix. */
+function renderCollections(root) {
+  const c = state.collections; if (!c) return;
+  root.appendChild(el('h2', 'big', c.title));
+  const g = el('div', 'grid');
+  g.appendChild(card({ id: c.id, kind: 'daily', title: c.title, caption: c.caption || '' }));
+  root.appendChild(g);
+  root.appendChild(el('p', 'foot', c.note));
+  const minLabel = m => m >= 1440 ? (LANG === 'es' ? 'Cada día' : 'Daily') : m >= 60 ? (m / 60) + ' h' : m + ' min';
+  const every = el('div', 'colrow');
+  every.appendChild(el('span', 'collabel', LANG === 'es' ? 'Cambiar cada' : 'Change every'));
+  const seg = el('div', 'colchips');
+  c.minuteOptions.forEach(m => {
+    const b = el('button', 'colchip', minLabel(m)); b.setAttribute('aria-pressed', m === c.minutes ? 'true' : 'false');
+    b.onclick = async () => { try { take(await api('api/collections/minutes', { minutes: m })); toast(t('toast_tv_updated')); } catch (e) { toast(t('toast_set_fail')); } };
+    seg.appendChild(b);
+  });
+  every.appendChild(seg); root.appendChild(every);
+  const th = el('div', 'colrow');
+  th.appendChild(el('span', 'collabel', LANG === 'es' ? 'Temas' : 'Themes'));
+  const chips = el('div', 'colchips');
+  c.themes.forEach(x => {
+    const b = el('button', 'colchip', x.label); b.setAttribute('aria-pressed', x.on ? 'true' : 'false');
+    b.onclick = async () => { try { take(await api('api/collections/theme', { id: x.id })); toast(t('toast_tv_updated')); } catch (e) { toast(t('toast_set_fail')); } };
+    chips.appendChild(b);
+  });
+  th.appendChild(chips); root.appendChild(th);
+  root.appendChild(el('p', 'foot', LANG === 'es' ? 'Marca varios para mezclarlos; siempre queda al menos uno. Sin internet, rota entre las últimas fotos descargadas.' : 'Tick several to mix them; at least one stays on. Offline, it rotates through the last pictures downloaded.'));
 }
 let uploading = 0;
 function uploadPhotos(e) { sendPhotos([...e.target.files]); }

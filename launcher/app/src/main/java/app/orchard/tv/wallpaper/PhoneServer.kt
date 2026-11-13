@@ -97,6 +97,21 @@ class PhoneServer private constructor(private val context: Context, private val 
                     onMain { Wallpapers.select(id) }
                     json(state())
                 }
+                // ROM "TV": wallpaper collections, as Personalize has them.
+                session.method == Method.POST && path == "/api/collections/theme" -> {
+                    val id = form(session)["id"].orEmpty()
+                    onMain {
+                        if (Collections.THEMES.any { it.id == id }) Collections.toggle(id)
+                        if (Wallpapers.selectedId != Wallpapers.COLLECTIONS) Wallpapers.select(Wallpapers.COLLECTIONS)
+                        Wallpapers.nextCollectionPicture(force = true)
+                    }
+                    json(state())
+                }
+                session.method == Method.POST && path == "/api/collections/minutes" -> {
+                    val m = form(session)["minutes"]?.toIntOrNull()
+                    onMain { if (m != null && m in Collections.MINUTES) { Collections.chooseMinutes(m); Wallpapers.rotateIfDue() } }
+                    json(state())
+                }
                 session.method == Method.POST && path == "/api/screensaver" -> {
                     val mode = ScreensaverMode.of(form(session)["mode"])
                     onMain { Wallpapers.chooseScreensaver(mode) }
@@ -236,6 +251,18 @@ class PhoneServer private constructor(private val context: Context, private val 
             .put("selected", selected)
             .put("latestDaily", Wallpapers.LATEST_DAILY)
             .put("rotatePhotos", Wallpapers.ROTATE_PHOTOS)
+            .put("collections", JSONObject()
+                .put("id", Wallpapers.COLLECTIONS)
+                .put("title", context.getString(app.orchard.tv.R.string.wp_collections))
+                .put("note", context.getString(app.orchard.tv.R.string.wp_collections_note))
+                .put("caption", Collections.caption ?: "")
+                .put("minutes", Collections.minutes)
+                .put("minuteOptions", JSONArray().apply { Collections.MINUTES.forEach { put(it) } })
+                .put("themes", JSONArray().apply {
+                    Collections.THEMES.forEach { th ->
+                        put(JSONObject().put("id", th.id).put("label", context.getString(th.label)).put("on", th.id in Collections.themes))
+                    }
+                }))
             .put("screensaver", Wallpapers.screensaver.key)
             .put("screensaverFollows", Wallpapers.screensaverFollows)
             .put("videos", JSONArray().apply {

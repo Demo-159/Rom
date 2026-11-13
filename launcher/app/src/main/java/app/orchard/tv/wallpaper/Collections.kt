@@ -71,7 +71,7 @@ object Collections {
         Theme("flowers", R.string.col_flowers, "flowers OR \"flower field\" OR tulips OR lavender"),
     )
     val DEFAULT_THEMES = setOf("space", "ocean", "animals", "nature")
-    val MINUTES = listOf(15, 30, 60, 24 * 60)
+    val MINUTES = listOf(1, 5, 15, 30, 60, 24 * 60)
     const val DEFAULT_MINUTES = 30
 
     private lateinit var app: Context
