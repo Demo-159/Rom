@@ -64,6 +64,32 @@ def install_app(system, rel_dir, apk, extract_libs):
     label(d)
 
 
+def apk_cert(apk):
+    out = subprocess.run([os.path.join(os.environ.get("ANDROID_HOME", "/home/user/sdk"), "build-tools", "36.0.0", "apksigner"),
+                          "verify", "--print-certs", apk], capture_output=True, text=True)
+    m = re.search(r"Signer #1 certificate SHA-256 digest: ([0-9a-f]+)", out.stdout)
+    return m.group(1) if out.returncode == 0 and m else None
+
+
+def install_tv_play_store(system):
+    """The Play Store's Android TV build in place of the phone one, only if Google signed it (the
+    same certificate as the stock Play Store), it runs on Android 7.1 and it has a TV launcher entry."""
+    tv = os.path.join(ROM, "prebuilt", "Phonesky-TV.apk")
+    if not os.path.exists(tv):
+        print("  (no Phonesky-TV.apk: keeping the phone Play Store)")
+        return
+    stock = os.path.join(system, "priv-app", "Phonesky", "Phonesky.apk")
+    want, got = apk_cert(stock), apk_cert(tv)
+    if not want or want != got:
+        sys.exit(f"Phonesky-TV.apk is not signed like the stock Play Store ({got} vs {want}): refusing it")
+    badging = subprocess.run(["aapt", "dump", "badging", tv], capture_output=True, text=True).stdout
+    sdk = int(re.search(r"sdkVersion:'(\d+)'", badging).group(1))
+    if "package: name='com.android.vending'" not in badging or sdk > 25 or "leanback-launchable-activity" not in badging:
+        sys.exit(f"Phonesky-TV.apk is not a Play Store for Android TV that runs on 7.1 (minSdk {sdk})")
+    install_app(system, "priv-app/Phonesky", tv, extract_libs=True)
+    print("  Play Store: Android TV build", re.search(r"versionName='([^']+)'", badging).group(1))
+
+
 def strip_modules(system):
     before = after = 0
     for base, _, files in os.walk(system):
@@ -133,6 +159,8 @@ def build_system(parts, work):
         install_app(mnt, "priv-app/iTvSettings", TV_SETTINGS_APK, extract_libs=False)
         tt = fetch(TIZENTUBE_URL, os.path.join(work, "TizenTube.apk"))
         install_app(mnt, "app/TizenTube", tt, extract_libs=True)
+        # Android TV Play Store, when rom/prebuilt/Phonesky-TV.apk is there (see install_tv_play_store).
+        install_tv_play_store(mnt)
         # Stands in for YouTube (same package name) and hands voice search results to TizenTube.
         install_app(mnt, "app/YouTubeBridge", os.path.join(ROM, "prebuilt", "YouTubeBridge.apk"), extract_libs=False)
         # 3. Overlay files (TV features).
