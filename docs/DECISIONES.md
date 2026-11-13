@@ -168,6 +168,12 @@ El detalle está en la sección 3.
 - **HDMI-CEC activado:** la TV se enciende y cambia a la cajita al encenderla, y se apaga con ella.
 - **Apagado automático (suspensión) tras 3 horas sin uso.** Se cambia en Ajustes → Pantalla.
 
+### 4.11 Play Store para Android TV (aplicado)
+- **Versión:** Google Play Store (Android TV) **51.8.09**, variante armeabi-v7a, Android 7.0+. Viene de APKMirror como bundle `.apkm`, entregado por el usuario.
+- **Verificación:** cada pieza está firmada con el **mismo certificado de Google** que el Play Store original de la ROM (`F0:FD:6C:5B…DB:83`). El script de armado lo comprueba y rechaza piezas con otra firma.
+- **Instalación:** `priv-app/Phonesky` con `base.apk` más las piezas de ARM, español e inglés (`rom/prebuilt/PhoneskyTV`, 24 MB). Las librerías nativas van extraídas en `lib/arm`. No se puede unir todo en un solo APK sin volver a firmarlo, y entonces dejaría de ser de Google.
+- **Riesgo:** la cajita no está certificada por Google. Si este Play Store no funcionara, la siguiente versión de la ROM vuelve al de celular quitando la carpeta `PhoneskyTV`.
+
 ## 5. Launcher (pantalla de inicio)
 
 **Decisión: Aerial, modificado a medida e incluido dentro de la ROM.** Reemplaza a GlassTV, que se probó en el emulador y no convenció tanto.

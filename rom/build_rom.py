@@ -72,22 +72,48 @@ def apk_cert(apk):
 
 
 def install_tv_play_store(system):
-    """The Play Store's Android TV build in place of the phone one, only if Google signed it (the
-    same certificate as the stock Play Store), it runs on Android 7.1 and it has a TV launcher entry."""
-    tv = os.path.join(ROM, "prebuilt", "Phonesky-TV.apk")
-    if not os.path.exists(tv):
-        print("  (no Phonesky-TV.apk: keeping the phone Play Store)")
+    """The Play Store's Android TV build (rom/prebuilt/PhoneskyTV: base plus the ARM, Spanish and
+    English splits, as APKMirror ships it) in place of the phone one. Only if Google signed every
+    piece with the stock Play Store's certificate, it runs on Android 7.1 and it has a TV launcher
+    entry. Android 7 reads a system app made of splits from its folder; the native libraries go
+    beside them, unpacked, as system apps do not extract them."""
+    src = os.path.join(ROM, "prebuilt", "PhoneskyTV")
+    if not os.path.isdir(src):
+        print("  (no PhoneskyTV: keeping the phone Play Store)")
         return
+    pieces = sorted(f for f in os.listdir(src) if f.endswith(".apk"))
     stock = os.path.join(system, "priv-app", "Phonesky", "Phonesky.apk")
-    want, got = apk_cert(stock), apk_cert(tv)
-    if not want or want != got:
-        sys.exit(f"Phonesky-TV.apk is not signed like the stock Play Store ({got} vs {want}): refusing it")
-    badging = subprocess.run(["aapt", "dump", "badging", tv], capture_output=True, text=True).stdout
+    want = stock_cert(stock)
+    for f in pieces:
+        got = apk_cert(os.path.join(src, f))
+        if not want or got != want:
+            sys.exit(f"PhoneskyTV/{f} is not signed like the stock Play Store ({got} vs {want}): refusing it")
+    base = os.path.join(src, "base.apk")
+    badging = subprocess.run(["aapt", "dump", "badging", base], capture_output=True, text=True).stdout
     sdk = int(re.search(r"sdkVersion:'(\d+)'", badging).group(1))
     if "package: name='com.android.vending'" not in badging or sdk > 25 or "leanback-launchable-activity" not in badging:
-        sys.exit(f"Phonesky-TV.apk is not a Play Store for Android TV that runs on 7.1 (minSdk {sdk})")
-    install_app(system, "priv-app/Phonesky", tv, extract_libs=True)
-    print("  Play Store: Android TV build", re.search(r"versionName='([^']+)'", badging).group(1))
+        sys.exit(f"PhoneskyTV is not a Play Store for Android TV that runs on 7.1 (minSdk {sdk})")
+    d = os.path.join(system, "priv-app", "Phonesky")
+    shutil.rmtree(d, ignore_errors=True)
+    os.makedirs(os.path.join(d, "lib", "arm"))
+    for f in pieces:
+        shutil.copy(os.path.join(src, f), os.path.join(d, f))
+        with zipfile.ZipFile(os.path.join(src, f)) as z:
+            for n in z.namelist():
+                if n.startswith("lib/armeabi-v7a/") and n.endswith(".so"):
+                    with z.open(n) as i, open(os.path.join(d, "lib", "arm", os.path.basename(n)), "wb") as o:
+                        shutil.copyfileobj(i, o)
+    label(d)
+    print("  Play Store: Android TV build", re.search(r"versionName='([^']+)'", badging).group(1), "+", len(pieces) - 1, "splits")
+
+
+def stock_cert(apk):
+    """The certificate of a v1-signed APK (the stock Play Store's v2 block was stripped in the image)."""
+    der = subprocess.run(["unzip", "-p", apk, "META-INF/*.RSA"], capture_output=True).stdout
+    pem = subprocess.run(["openssl", "pkcs7", "-inform", "DER", "-print_certs"], input=der, capture_output=True).stdout
+    fp = subprocess.run(["openssl", "x509", "-noout", "-fingerprint", "-sha256"], input=pem, capture_output=True).stdout.decode()
+    m = re.search(r"=([0-9A-F:]+)", fp)
+    return m.group(1).replace(":", "").lower() if m else None
 
 
 def strip_modules(system):
