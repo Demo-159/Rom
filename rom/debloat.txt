@@ -58,3 +58,10 @@ fast_preinstall/ZingTV_com.zing.tv.androidtv2.apk
 fast_preinstall/com.google.android.youtube.tv_2.02.08.apk
 fast_preinstall/epi.apk
 preinstall/com.netflix.mediaclient-2.apk
+
+# --- Kodi fork "TV-Center" (82 MB) and 77 MB of add-ons unpacked on first boot
+xbmc_preinstall
+
+# --- Services with no use on this box: camera (it has none) and the performance profiler
+etc/init/cameraserver.rc
+etc/init/perfprofd.rc

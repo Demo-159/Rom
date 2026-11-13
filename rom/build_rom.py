@@ -178,6 +178,11 @@ def patch_boot(parts, work):
        "backup ramdisk.cpio.orig",
        "mkdir 000 .backup",
        "add 000 .backup/.magisk config")
+    # Factory and vendor services that slow the boot or sit in memory (rom/boot_services.py).
+    for rc in ("init.amlogic.rc", "init.amlogic.board.rc"):
+        mb("cpio", "ramdisk.cpio", f"extract {rc} {rc}")
+        run(sys.executable, os.path.join(ROM, "tools", "boot_services.py"), os.path.join(mw, rc))
+        mb("cpio", "ramdisk.cpio", f"add 0750 {rc} {rc}")
     mb("repack", "boot.img")
     shutil.copy(os.path.join(mw, "new-boot.img"), os.path.join(parts, "boot.PARTITION"))
 
