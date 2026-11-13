@@ -107,7 +107,11 @@ El detalle está en la sección 3.
 - **Lo viable es la búsqueda por voz de Google para Android TV** (la app "Google para Android TV", paquete `com.google.android.katniss`). Permite buscar por voz en YouTube y en otras apps, y abrir apps. No es el asistente conversacional moderno.
   - **Pendiente comprobar** qué versión instala y funciona hoy en Android 7.1. No hay fuentes recientes sobre esto.
   - Se ve beneficiada por el cambio 4.1: con la ROM identificada como Android TV, aparece en el Play Store.
-- **Hace falta un control con micrófono.** El control infrarrojo que trae el TX3 Mini no tiene micrófono. Sirve un control Bluetooth o 2.4 GHz con micrófono, como los "air mouse" G10S o G20S.
+- **Control con micrófono: el usuario ya tiene uno.** Es un mando con receptor USB y micrófono, y funciona con la ROM original. Para que siga funcionando, la ROM conserva sin cambios:
+  - El kernel original, con los drivers USB HID y de audio USB.
+  - Los módulos de audio: `audio.usb.default.so` (la ROM ya declara entrada de micrófono USB en `audio_policy.conf`) y los módulos de mandos de voz `audio.dia_remote.default.so` y `audio.huitong.default.so`, con sus archivos `*_audio_policy_configuration.xml`.
+  - Todos los mapas de teclas de `/system/usr/keylayout/`.
+  - **Pendiente:** saber qué app abre hoy el botón del micrófono, para no borrarla o para redirigir el botón a la búsqueda por voz de Google.
 - **Choque con el rendimiento:** la app de Google mantiene servicios en segundo plano y consume RAM. Se instala, pero se ajusta para que no se active sola más de lo necesario.
 
 ## 5. Launcher (pantalla de inicio)
@@ -181,7 +185,7 @@ La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, as�
 ## 9. Pendientes (resumen)
 
 - [ ] Comprobar qué versión de la búsqueda por voz de Google para Android TV funciona en 7.1 (sección 4.6).
-- [ ] Confirmar si el usuario tiene, o va a comprar, un control con micrófono.
+- [x] ~~Control con micrófono~~ → **Tiene uno USB que ya funciona.** Falta saber qué app abre su botón de micrófono.
 
 - [ ] Elegir launcher, priorizando el más ligero.
 - [x] ~~Decidir si se quitan los servicios de Google~~ → **Se conservan.**
