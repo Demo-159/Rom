@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
@@ -841,31 +842,32 @@ fun StatusPill(
         modifier = modifier,
     ) { state ->
         LaunchedEffect(state.focused) { onFocused(state.focused) }
+        // ROM "TV": a round glass button with only a gear (the time joins it once the clock scrolls away).
         val bg by animateColorAsState(
-            if (state.focused) Palette.Focus else Color.Transparent,
+            if (state.focused) Palette.Focus else Color.White.copy(alpha = 0.16f),
             tween(160, easing = Motion.EaseOut), label = "pill-bg",
         )
-        val fg = if (state.focused) Palette.OnFocus else Color.White.copy(alpha = 0.9f)
+        val fg = if (state.focused) Palette.OnFocus else Color.White.copy(alpha = 0.95f)
         Row(
             Modifier
                 .clip(RoundedCornerShape(50))
-                .drawBehind { drawRect(bg) }
-                .height(34.dp)
-                .padding(horizontal = 14.dp),
+                .drawBehind {
+                    drawRect(bg)
+                    if (!state.focused) drawRoundRect(
+                        Color.White.copy(alpha = 0.22f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(size.height / 2),
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.dp.toPx()),
+                    )
+                }
+                .height(40.dp)
+                .then(if (showTime) Modifier.padding(horizontal = 14.dp) else Modifier.width(40.dp)),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
         ) {
-            val glyph = when (network.kind) {
-                NetKind.Wifi -> Glyph.Wifi
-                NetKind.Ethernet -> Glyph.Ethernet
-                NetKind.Offline -> Glyph.Offline
-            }
-            GlyphIcon(glyph, fg, 17.dp, level = network.level)
-            if (network.vpn) VpnBadge(fg)
             if (showTime) {
                 BasicText(timeText(now), style = Type.Headline.copy(color = fg))
             }
-            GlyphIcon(Glyph.Switches, fg, 17.dp)
+            GlyphIcon(Glyph.Gear, fg, 20.dp)
         }
     }
 }
