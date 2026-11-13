@@ -125,6 +125,16 @@ El detalle está en la sección 3.
   - **Pendiente:** revisar si hay una versión más nueva de esta app que funcione en Android 7.1, y comprobar que el launcher nuevo abra la búsqueda por voz con el botón.
 - **Choque con el rendimiento:** la app de Google mantiene servicios en segundo plano y consume RAM. Se instala, pero se ajusta para que no se active sola más de lo necesario.
 
+### 4.7 YouTube: TizenTube Cobalt en lugar de la app oficial
+**Decisión del usuario:** se usa **TizenTube Cobalt** (`io.gh.reisxd.tizentube.cobalt`, https://github.com/reisxd/TizenTubeCobalt) como app de YouTube.
+
+- **En el launcher** se llama **"YouTube"** y usa la imagen con el aspecto oficial: logo rojo con texto sobre fondo blanco, la variante "tvOS" de la biblioteca de Aerial.
+- **Búsqueda por voz:** lo ideal es que los videos de YouTube encontrados por voz se abran en TizenTube y no en la app original.
+  - TizenTube Cobalt declara que abre los enlaces `youtube.com` / `youtu.be` (`VIEW`) y las búsquedas para reproducir (`MEDIA_PLAY_FROM_SEARCH`). Está comprobado en su `AndroidManifest.xml.jinja2`.
+  - **Plan A:** quitar de la ROM el YouTube original (`fast_preinstall/com.google.android.youtube.tv_2.02.08.apk`), así esos enlaces llegan a TizenTube.
+  - **Pendiente probar en la cajita** si la búsqueda por voz de Google manda los resultados a cualquier app que abra `youtube.com` o solo al paquete `com.google.android.youtube.tv`.
+  - **Plan B**, si solo funciona con el paquete oficial: una mini app "puente" con el nombre de paquete `com.google.android.youtube.tv`, sin interfaz, que reenvíe cada video o búsqueda a TizenTube. Hay que vigilar que el Play Store no intente "actualizarla".
+
 ## 5. Launcher (pantalla de inicio)
 
 **Decisión: Aerial, modificado a medida e incluido dentro de la ROM.** Reemplaza a GlassTV, que se probó en el emulador y no convenció tanto.

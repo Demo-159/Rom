@@ -221,10 +221,18 @@ object IconLibrary {
             }
         }.let { found ->
             // ROM "TV": apps that stand in for another one wear its pictures, unless the index has their own.
-            found + ALIASES.mapNotNull { (alias, of) -> found[of]?.takeIf { alias !in found }?.let { alias to it } }
+            val preferred = found.mapValues { (pkg, list) ->
+                PREFERRED[pkg]?.let { id -> list.sortedByDescending { it.id == id } } ?: list
+            }
+            preferred + ALIASES.mapNotNull { (alias, of) -> preferred[of]?.takeIf { alias !in preferred }?.let { alias to it } }
         }
         map to (root.optJSONObject("credits") ?: JSONObject())
     }.getOrNull()
+
+    /** ROM "TV": package → the picture to use by default, where the library has several. */
+    private val PREFERRED = mapOf(
+        "com.google.android.youtube.tv" to "tvos", // the official look: red logo and wordmark on white
+    )
 
     /** ROM "TV": package → the package whose library pictures it uses. */
     private val ALIASES = mapOf(

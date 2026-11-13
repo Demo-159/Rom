@@ -29,7 +29,12 @@ object AppNames {
         all = json.keys().asSequence().associateWith { json.optString(it) }.filterValues { it.isNotBlank() }
     }
 
-    fun of(key: String): String? = all[key]
+    fun of(key: String): String? = all[key] ?: DEFAULT_NAMES[key]
+
+    /** ROM "TV": names an app carries until the owner types another one. */
+    private val DEFAULT_NAMES = mapOf(
+        "io.gh.reisxd.tizentube.cobalt" to "YouTube", // TizenTube Cobalt stands in for YouTube
+    )
 
     /** A blank name goes back to the app's own. Call on the main thread: Home watches [all]. */
     fun rename(key: String, name: String?) {
