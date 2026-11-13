@@ -16,5 +16,113 @@
   "theme": "space",
   "caption": "CC BY 3.0 · Wikimedia Commons",
   "source": "https://commons.wikimedia.org/wiki/File:2012-03-14_21-42-55-file-etoiles-14f-2min-3d.jpg"
+ },
+ {
+  "file": "ocean_1.webp",
+  "theme": "ocean",
+  "caption": "Poco a poco · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Bl%C3%A9nido_%28Plagiotremus_rhinorhynchos%29%2C_Ambalihabe%2C_Madagascar%2C_2025-09-16%2C_DD_81.jpg"
+ },
+ {
+  "file": "ocean_2.webp",
+  "theme": "ocean",
+  "caption": "Diego Delso · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Cabruza_%28Parablennius_gattorugine%29%2C_Parque_natural_de_la_Arr%C3%A1bida%2C_Portugal%2C_2022-07-22%2C_DD_48.jpg"
+ },
+ {
+  "file": "ocean_3.webp",
+  "theme": "ocean",
+  "caption": "H. Zell · GFDL · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Pomacanthus_maculosus_-_Wilhelma_01.jpg"
+ },
+ {
+  "file": "nature_1.webp",
+  "theme": "nature",
+  "caption": "Diego Delso · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Catedrales_de_Tara%2C_Chile%2C_2016-02-07%2C_DD_62.JPG"
+ },
+ {
+  "file": "nature_2.webp",
+  "theme": "nature",
+  "caption": "Diego Delso · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Caba%C3%B1a_subterr%C3%A1nea_en_la_regi%C3%B3n_de_B%C3%BA%C3%B0ahraun%2C_Vesturland%2C_Islandia%2C_2014-08-14%2C_DD_046.JPG"
+ },
+ {
+  "file": "nature_3.webp",
+  "theme": "nature",
+  "caption": "Diego Delso · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Aguarales_de_Valpalmas%2C_Zaragoza%2C_Espa%C3%B1a%2C_2015-01-06%2C_DD_26.JPG"
+ },
+ {
+  "file": "birds_1.webp",
+  "theme": "birds",
+  "caption": "H. Zell · GFDL · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Erfurt_-_Th%C3%BCringer_Zoopark_-_Rhea_americana_01.jpg"
+ },
+ {
+  "file": "cars_1.webp",
+  "theme": "cars",
+  "caption": "Alexander Migl · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Porsche_356_B_Classic-Gala_2021_1X7A0119.jpg"
+ },
+ {
+  "file": "cars_2.webp",
+  "theme": "cars",
+  "caption": "Christopher Crouzet · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Reflection_on_the_Salar_de_Uyuni%2C_bolivia.jpg"
+ },
+ {
+  "file": "mountains_1.webp",
+  "theme": "mountains",
+  "caption": "HoroshilovAleksandr · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:View_of_Psebaisky_Zoological_Reserve_in_Krasnodar_Krai%2C_Russia_-_2017.jpg"
+ },
+ {
+  "file": "waterfalls_1.webp",
+  "theme": "waterfalls",
+  "caption": "Diego Delso · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:%C3%96xar%C3%A1rfoss%2C_Parque_Nacional_de_%C3%9Eingvellir%2C_Su%C3%B0urland%2C_Islandia%2C_2014-08-16%2C_DD_029.JPG"
+ },
+ {
+  "file": "beaches_1.webp",
+  "theme": "beaches",
+  "caption": "CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Fishermen_at_Kavarathi%2C_Lakshadweep%2C_India_%28edit%29.jpg"
+ },
+ {
+  "file": "sunsets_1.webp",
+  "theme": "sunsets",
+  "caption": "Basile Morin · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Water_reflection_of_sunset_with_gray_and_orange_clouds_and_boats_moored_to_the_bank_in_Pakse_Laos.jpg"
+ },
+ {
+  "file": "cities_1.webp",
+  "theme": "cities",
+  "caption": "CC BY-SA 3.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Attica_06-13_Athens_50_View_from_Philopappos_-_Acropolis_Hill.jpg"
+ },
+ {
+  "file": "flowers_1.webp",
+  "theme": "flowers",
+  "caption": "Ermell · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Hoverfly_cockade_stack-20190809-RM-064310.jpg"
+ },
+ {
+  "file": "forests_1.webp",
+  "theme": "forests",
+  "caption": "W.carter · CC0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Beech_and_ferns_in_Gullmarsskogen.jpg"
+ },
+ {
+  "file": "animals_1.webp",
+  "theme": "animals",
+  "caption": "Tisha Mukherjee · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Indian_elephant_in_Kaziranga_National_Park_March_2025_by_Tisha_Mukherjee_04.jpg"
+ },
+ {
+  "file": "animals_2.webp",
+  "theme": "animals",
+  "caption": "Rhododendrites · CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Baird%27s_tapir_mother_with_baby_%2892151%29.jpg"
  }
 ]
