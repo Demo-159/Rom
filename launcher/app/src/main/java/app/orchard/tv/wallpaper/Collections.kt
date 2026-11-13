@@ -36,6 +36,13 @@ object Collections {
     private const val AGENT = "TV-Launcher/1.0 (Aerial fork for a TV box ROM)"
     /** Featured pictures: reviewed by Commons for quality, the best of its 100 million files. */
     private const val POOL = "incategory:Featured_pictures_on_Wikimedia_Commons"
+    /**
+     * Photographs only: Commons' featured pictures also hold paintings, prints, maps and scans,
+     * whose paper margins and old colours read badly as a TV wallpaper.
+     */
+    private const val PHOTOS_ONLY = "-painting -paintings -lithograph -engraving -etching -drawing -illustration " +
+        "-print -map -poster -artwork -watercolor -\"oil on canvas\" -scan -manuscript -diagram -stamp -coin " +
+        "-incategory:Featured_pictures_of_paintings -incategory:Featured_pictures_of_maps"
     /** CirrusSearch reads no further into results than this. */
     private const val MAX_OFFSET = 9_900
     private const val TOTALS_MS = 3L * 24 * 60 * 60 * 1000
@@ -108,36 +115,72 @@ object Collections {
 
     val due: Boolean get() = prefs.getLong("slot", Long.MIN_VALUE) != slot() || !current.exists()
 
+    /** The last pictures shown, kept to go on changing without internet. */
+    private val history by lazy { File(dir, "history").apply { mkdirs() } }
+    private const val HISTORY_MAX = 20
+
     /**
-     * Moves on to the next picture: the one fetched ahead if there is one, else fetches one now.
-     * Then fetches the following one ahead. Returns whether [current] changed. Off the main thread.
+     * Moves on to the next picture: the one fetched ahead if there is one, else fetches one now;
+     * offline, one of the last [HISTORY_MAX] pictures of the ticked themes. Then fetches the
+     * following one ahead. Returns whether [current] changed. Off the main thread.
      */
     suspend fun advance(width: Int): Boolean = withContext(Dispatchers.IO) {
         lock.withLock {
             var changed = false
+            var theme: String? = null
             if (next.exists() && next.renameTo(current)) {
                 caption = prefs.getString("next_caption", null)
+                theme = prefs.getString("next_theme", null)
                 changed = true
-            } else fetchInto(current, width)?.let { caption = it; changed = true }
+            } else fetchInto(current, width)?.let { (c, t) -> caption = c; theme = t; changed = true }
+            if (changed) {
+                keepInHistory(theme)
+            } else if (fromHistory()) {
+                changed = true
+            }
             if (changed) prefs.edit { putLong("slot", slot()); putString("caption", caption) }
-            fetchInto(next, width)?.let { prefs.edit { putString("next_caption", it) } }
+            fetchInto(next, width)?.let { (c, t) -> prefs.edit { putString("next_caption", c); putString("next_theme", t) } }
             changed
         }
     }
 
-    /** A random picture of a random ticked theme into [file]; its caption, or null. */
-    private fun fetchInto(file: File, width: Int): String? {
+    /** Copies [current] into the history, named by time and theme, dropping the oldest past [HISTORY_MAX]. */
+    private fun keepInHistory(theme: String?) {
+        runCatching {
+            val base = "${System.currentTimeMillis()}_${theme ?: "any"}"
+            current.copyTo(File(history, "$base.jpg"), overwrite = true)
+            File(history, "$base.txt").writeText(caption ?: "")
+            history.listFiles { f -> f.name.endsWith(".jpg") }?.sortedByDescending { it.name }?.drop(HISTORY_MAX)?.forEach {
+                it.delete(); File(it.path.removeSuffix(".jpg") + ".txt").delete()
+            }
+        }.onFailure { Log.w(TAG, "could not keep a picture in the history", it) }
+    }
+
+    /** Offline: another kept picture, of a ticked theme where there is one. */
+    private fun fromHistory(): Boolean = runCatching {
+        val all = history.listFiles { f -> f.name.endsWith(".jpg") }?.toList().orEmpty()
+        val shown = prefs.getString("history_shown", null)
+        val ofThemes = all.filter { it.nameWithoutExtension.substringAfter('_') in themes }
+        val pick = (ofThemes.ifEmpty { all }).filter { it.name != shown }.randomOrNull() ?: return false
+        pick.copyTo(current, overwrite = true)
+        caption = File(pick.path.removeSuffix(".jpg") + ".txt").takeIf { it.exists() }?.readText()?.ifBlank { null }
+        prefs.edit { putString("history_shown", pick.name) }
+        true
+    }.getOrDefault(false)
+
+    /** A random picture of a random ticked theme into [file]; its caption and theme, or null. */
+    private fun fetchInto(file: File, width: Int): Pair<String, String>? {
         repeat(3) {
             val theme = THEMES.filter { it.id in themes }.randomOrNull() ?: return null
             runCatching { fetchOne(theme, file, width) }
                 .onFailure { Log.w(TAG, "could not fetch a ${theme.id} picture", it) }
-                .getOrNull()?.let { return it }
+                .getOrNull()?.let { return it to theme.id }
         }
         return null
     }
 
     private fun fetchOne(theme: Theme, file: File, width: Int): String? {
-        val search = "$POOL (${theme.query}) filew:>1600"
+        val search = "$POOL (${theme.query}) filew:>1600 $PHOTOS_ONLY"
         val total = total(theme, search).coerceAtMost(MAX_OFFSET)
         if (total <= 0) return null
         val offset = Random.nextInt(0, maxOf(1, total - 10))
@@ -161,7 +204,7 @@ object Collections {
 
     /** How many pictures a theme has, asked again every few days. */
     private fun total(theme: Theme, search: String): Int {
-        val key = "total:${theme.id}"
+        val key = "total2:${theme.id}"
         val at = prefs.getLong("$key:at", 0)
         if (System.currentTimeMillis() - at < TOTALS_MS) prefs.getInt(key, 0).takeIf { it > 0 }?.let { return it }
         val url = "$API?action=query&format=json&list=search&srnamespace=6&srlimit=1&srinfo=totalhits&srprop=&srsearch=" + enc(search)
