@@ -84,6 +84,14 @@ def edit_build_prop(path, changes):
     open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
 
 
+def fsck(raw):
+    """e2fsck answers 1 when it fixed something minor (as the padding of a bitmap); only 2+ is trouble."""
+    print("+ e2fsck -fy", raw, flush=True)
+    rc = subprocess.run(["e2fsck", "-fy", raw]).returncode
+    if rc > 1:
+        sys.exit(f"e2fsck failed ({rc})")
+
+
 def build_system(parts, work):
     sparse = os.path.join(parts, "system.PARTITION")
     raw = os.path.join(work, "system.raw")
@@ -127,7 +135,11 @@ def build_system(parts, work):
         run("df", "-h", mnt)
     finally:
         run("umount", mnt)
-    run("e2fsck", "-fy", raw)
+    fsck(raw)
+    # Mounting here marks the journal (revoke records); a fresh journal leaves it as stock had it.
+    run("tune2fs", "-O", "^has_journal", raw)
+    run("tune2fs", "-j", raw)
+    fsck(raw)
     run("img2simg", raw, sparse)
     os.remove(raw)
 
