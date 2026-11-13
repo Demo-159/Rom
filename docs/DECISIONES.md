@@ -118,7 +118,16 @@ El detalle está en la sección 3.
 
 ## 5. Launcher (pantalla de inicio)
 
-**Estado: todavía no se ha elegido.** El launcher del fabricante (`Oranth_Launcher_720P`) se va a reemplazar porque se ve feo.
+**Decisión: GlassTV, modificado a medida e incluido dentro de la ROM.**
+
+- Repositorio original: https://github.com/jichun29/glasstv
+- **Licencia MIT:** permite modificarlo y distribuirlo dentro de la ROM, siempre que se conserve el aviso de copyright y el texto de la licencia. Se incluye en la ROM y en el repositorio.
+- **Por qué este:** es de los más ligeros (tiene versión para Android 4.4), viene en español, trae centro de control, reloj grande y fondo estático. Encaja con la prioridad de rendimiento.
+- **Compilación:** se puede compilar en el entorno de trabajo. Hay Java, y se llega al SDK de Android (dl.google.com), a Gradle y a Maven de Google.
+- **Modificaciones:** pendientes de definir con el usuario. Punto de partida: el estilo de la maqueta D, con fondo estático.
+- La búsqueda por voz tiene que abrirse con el botón del micrófono del mando (sección 4.6).
+
+El launcher del fabricante (`Oranth_Launcher_720P`) se reemplaza.
 
 ### Requisitos
 - **Consumir lo mínimo de RAM y CPU** (sección 3). Con fondo estático, sin animaciones de fondo.
@@ -163,7 +172,11 @@ Como la ROM está firmada con *test-keys* públicas, se pueden modificar y volve
 
 La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, así que el repositorio guarda solo herramientas, scripts y documentación.
 
-**Pendiente:** cómo se entrega. Opciones:
+**Decisión del usuario: descarga temporal.** La ROM terminada se comprime y se sube a un servicio de descarga temporal, y el usuario recibe el enlace.
+- Antes de subir se confirma con el usuario el servicio concreto, porque subir es publicar el archivo en un servicio externo.
+- Se acompaña de su suma SHA-256 para comprobar que la descarga llegó completa.
+
+Opciones que se evaluaron:
 1. Enlace de descarga temporal. Requiere permiso para subirla a un servicio externo.
 2. Partes de menos de 100 MB dentro del repositorio.
 3. Script para generarla en la PC del usuario.
@@ -189,10 +202,10 @@ La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, as�
 - [x] ~~Qué búsqueda por voz trae la ROM~~ → **Google para Android TV** (`AndroidApp22.apk`). Se conserva. Falta ver si hay una versión más nueva que funcione en 7.1.
 - [x] ~~Control con micrófono~~ → **Tiene uno USB que ya funciona** y abre la búsqueda por voz de Google.
 
-- [ ] Elegir launcher, priorizando el más ligero.
+- [x] ~~Elegir launcher~~ → **GlassTV modificado.** Falta definir las modificaciones.
 - [x] ~~Decidir si se quitan los servicios de Google~~ → **Se conservan.**
 - [ ] Nombre de la ROM y logo.
-- [ ] Forma de entrega.
+- [x] ~~Forma de entrega~~ → **Descarga temporal.** Falta elegir el servicio al momento de subir.
 - [ ] Lista final de apps a borrar.
 - [ ] Valores de rendimiento.
 - [ ] Decidir qué hacer con la configuración del sistema.
