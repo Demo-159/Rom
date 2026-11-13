@@ -127,14 +127,20 @@ El detalle está en la sección 3.
 
 ## 5. Launcher (pantalla de inicio)
 
-**Decisión: GlassTV, modificado a medida e incluido dentro de la ROM.**
+**Decisión: Aerial, modificado a medida e incluido dentro de la ROM.** Reemplaza a GlassTV, que se probó en el emulador y no convenció tanto.
 
-- Repositorio original: https://github.com/jichun29/glasstv
-- **Licencia MIT:** permite modificarlo y distribuirlo dentro de la ROM, siempre que se conserve el aviso de copyright y el texto de la licencia. Se incluye en la ROM y en el repositorio.
-- **Por qué este:** es de los más ligeros (tiene versión para Android 4.4), viene en español, trae centro de control, reloj grande y fondo estático. Encaja con la prioridad de rendimiento.
-- **Compilación:** se puede compilar en el entorno de trabajo. Hay Java, y se llega al SDK de Android (dl.google.com), a Gradle y a Maven de Google.
-- **Modificaciones:** pendientes de definir con el usuario. Punto de partida: el estilo de la maqueta D, con fondo estático.
-- La búsqueda por voz tiene que abrirse con el botón del micrófono del mando (sección 4.6).
+- Repositorio original: https://github.com/pengchujin/aerial-tv (paquete `app.orchard.tv`, versión 1.96).
+- **Licencia MIT:** permite modificarlo y distribuirlo dentro de la ROM, siempre que se conserve el aviso de copyright.
+- **Estilo:** parecido al Apple TV. Reloj grande, fondo a pantalla completa, fila de apps favoritas sobre una repisa de vidrio y todas las apps debajo. Trae carpetas, centro de control y salvapantallas.
+- **Compatibilidad:** pide Android 5.0+ (`minSdk 21`) y trae librerías `armeabi-v7a`. Se instala en el emulador de Android TV 7.1.
+- **Mantenimiento:** muy activo; tuvo cambios el 13 de noviembre de 2026.
+- **Cambios necesarios:**
+  - **Traducción al español:** solo trae inglés, chino, ruso, ucraniano y kazajo.
+  - **Recortar permisos:** pide ubicación, cuentas, sincronización, ventanas superpuestas, ajustes seguros, etc.; se dejan solo los imprescindibles.
+  - **Rendimiento:** fondo estático por defecto. Sus salvapantallas en video aéreo gastan recursos y red; se dejan opcionales o se cambian por el de reloj.
+  - Hay que revisar si trae funciones pensadas para TVs chinas (por ejemplo, servicios o pesos chinos para el clima) y quitar lo que no sirva.
+  - El botón del micrófono tiene que abrir la búsqueda por voz de Google (sección 4.6).
+- **Lite:** el repositorio trae una versión `lite` (`minSdk 14`). Se evalúa si conviene por rendimiento.
 
 El launcher del fabricante (`Oranth_Launcher_720P`) se reemplaza.
 
@@ -211,7 +217,7 @@ Opciones que se evaluaron:
 - [x] ~~Qué búsqueda por voz trae la ROM~~ → **Google para Android TV** (`AndroidApp22.apk`). Se conserva. Falta ver si hay una versión más nueva que funcione en 7.1.
 - [x] ~~Control con micrófono~~ → **Tiene uno USB que ya funciona** y abre la búsqueda por voz de Google.
 
-- [x] ~~Elegir launcher~~ → **GlassTV modificado.** Falta definir las modificaciones.
+- [x] ~~Elegir launcher~~ → **Aerial modificado** (antes GlassTV). Traducirlo al español, recortar permisos y ponerle fondo estático.
 - [x] ~~Decidir si se quitan los servicios de Google~~ → **Se conservan.**
 - [x] ~~Nombre de la ROM y logo~~ → **"TV", marca blanca.** Sin logo de arranque (pantalla negra) y animación original al estilo Google TV.
 - [x] ~~Forma de entrega~~ → **Descarga temporal.** Falta elegir el servicio al momento de subir.
