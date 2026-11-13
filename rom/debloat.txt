@@ -1,0 +1,60 @@
+# ROM "TV": paths under /system removed from the stock firmware (TX3Mini-17APK-20190110).
+# One per line; a folder goes with everything in it. Lines starting with # are notes.
+
+# --- Oranth (the box maker): launcher, settings, updates, tests, device info, LEDs
+app/Oranth_Launcher_720P
+priv-app/Settings_oranth
+app/OTAUpgrade
+app/AddonsUpdate
+app/FactoryTest_oranth
+app/Deviceinfo
+app/Dig
+app/LedStatus
+
+# --- Phone apps that make no sense on a TV box
+app/Camera2
+app/Gallery2
+app/Music
+priv-app/MusicFX
+app/PhotoTable
+app/BasicDreams
+priv-app/WallpaperCropper
+app/PartnerBookmarksProvider
+app/WAPPushManager
+app/GoogleCalendarSyncAdapter
+app/GoogleContactsSyncAdapter
+priv-app/GoogleFeedback
+
+# --- Fallback launcher (only Aerial, as decided)
+priv-app/Launcher2
+
+# --- Media services that run in the background and nobody asked for
+priv-app/DLNA
+app/Miracast
+app/NativeImagePlayer
+app/RemoteIME
+app/PPPoE
+app/AppInstaller
+
+# --- Browser: Chrome twice (system and preinstall), 250 MB, slow on this box
+app/Chrome
+
+# --- Preinstalled apps: Vietnamese apps, YouTube (TizenTube replaces it), Chrome, Netflix.
+# Kept: AndroidApp22.apk = Google for Android TV, the remote's voice search.
+fast_preinstall/AirScreen_com.ionitech.airscreen.apk
+fast_preinstall/BobaTV_com.vietigniter.boba.apk
+fast_preinstall/Chrome_com.android.chrome.apk
+fast_preinstall/ClipTV_vn.com.vega.clipvn.tv.apk
+fast_preinstall/FPTPlay_net.fptplay.ottbox.apk
+fast_preinstall/HTVC_Mod_ATV_MinhTam.apk
+fast_preinstall/KaraTube_vn.skplayer.karatube.apk
+fast_preinstall/MyTVNetChoTV_vn.vnptmedia.mytv.apk
+fast_preinstall/NhacCuaTuiTV_vn.nhaccuatui.tv.apk
+fast_preinstall/Speedtest_org.zwanoo.android.speedtest.apk
+fast_preinstall/THVLi_Mod_ATV_MinhTam.apk
+fast_preinstall/VTVgoTV_vn.vtv.vtvgotv.apk
+fast_preinstall/ZingMp3_vng.zing.mp3.apk
+fast_preinstall/ZingTV_com.zing.tv.androidtv2.apk
+fast_preinstall/com.google.android.youtube.tv_2.02.08.apk
+fast_preinstall/epi.apk
+preinstall/com.netflix.mediaclient-2.apk

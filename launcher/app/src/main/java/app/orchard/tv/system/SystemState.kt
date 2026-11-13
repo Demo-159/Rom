@@ -199,7 +199,8 @@ object SystemProbe {
         } else null
 
     fun settingsIntent(context: Context): Intent =
-        ChanghongSettings.intent(context)
+        tvSettings(context, ".MainSettings")
+            ?: ChanghongSettings.intent(context)
             ?: fengOsSettingsIntent(context)
             ?: xgimiSettingsIntent(context, "Settings://com.xgimi.misckey.main/mainPage")
             ?: konkaSettingsIntent(context)
@@ -221,6 +222,15 @@ object SystemProbe {
      * remote working. MiTV-MFTR0 (Android 14) has the receiver too, but its activity opens.
      */
     private val XIAOMI_SETTINGS_POPUP = Intent("com.xiaomi.intent.action.show.globalsetting").setPackage("com.xiaomi.mitv.settings")
+
+    /**
+     * ROM "TV": a page of the Android TV settings app (com.android.tv.settings), the only settings
+     * this ROM shows; null where it is not installed.
+     */
+    fun tvSettings(context: Context, activity: String): Intent? {
+        val intent = Intent().setClassName("com.android.tv.settings", "com.android.tv.settings$activity")
+        return intent.takeIf { runCatching { context.packageManager.resolveActivity(it, 0) }.getOrNull() != null }
+    }
 
     /** What to open when the settings page just opened closes at once (LaunchFallback). */
     fun settingsFallbacks(context: Context): List<Intent> =

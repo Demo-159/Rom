@@ -354,4 +354,9 @@
     <string name="col_aircraft">Aircraft</string>
     <string name="col_trains">Trains</string>
     <string name="col_flowers">Flowers</string>
+    <string name="cc_quick_display">Display &amp; Resolution</string>
+    <string name="cc_quick_sound">Sound</string>
+    <string name="cc_quick_apps">Apps</string>
+    <string name="cc_quick_storage">Storage</string>
+    <string name="cc_quick_about">About</string>
 </resources>

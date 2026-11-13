@@ -355,4 +355,9 @@
     <string name="col_aircraft">Aviones</string>
     <string name="col_trains">Trenes</string>
     <string name="col_flowers">Flores</string>
+    <string name="cc_quick_display">Pantalla y resolución</string>
+    <string name="cc_quick_sound">Sonido</string>
+    <string name="cc_quick_apps">Aplicaciones</string>
+    <string name="cc_quick_storage">Almacenamiento</string>
+    <string name="cc_quick_about">Acerca de</string>
 </resources>

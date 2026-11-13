@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ROM "TV": the box says it is an Android TV, so the Play Store offers TV apps
+     (Projectivy, TV versions of streaming apps) and apps open their TV layouts. -->
+<permissions>
+    <feature name="android.software.leanback" />
+    <feature name="android.software.leanback_only" />
+    <feature name="android.hardware.type.television" />
+</permissions>

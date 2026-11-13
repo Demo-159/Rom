@@ -382,6 +382,17 @@ private fun MainPage(
             stringResource(R.string.cc_personalize),
             onClick = { vm.overlay = Overlay.Wallpaper },
         )
+        // ROM "TV": straight to the settings people look for, in the Android TV settings app.
+        listOf(
+            Triple(Glyph.Hdmi, R.string.cc_quick_display, ".device.display.DisplayActivity"),
+            Triple(Glyph.Speaker, R.string.cc_quick_sound, ".device.sound.SoundActivity"),
+            Triple(Glyph.Bag, R.string.cc_quick_apps, ".device.apps.AppsActivity"),
+            Triple(Glyph.Usb, R.string.cc_quick_storage, ".device.StorageResetActivity"),
+            Triple(Glyph.Info, R.string.cc_quick_about, ".about.AboutActivity"),
+        ).forEach { (glyph, label, activity) ->
+            val intent = remember(activity) { SystemProbe.tvSettings(context, activity) }
+            if (intent != null) MenuRow(glyph, stringResource(label), onClick = { vm.whenUnlocked { onOpen(intent) } }, trailing = "›")
+        }
         // What the TV opens when switched on: easy to forget, and puzzling when it happens.
         vm.bootTargetLabel()?.let { name ->
             MenuRow(

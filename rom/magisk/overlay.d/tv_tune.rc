@@ -1,0 +1,12 @@
+# ROM "TV": runs tv_tune.sh with Magisk's rights (Magisk puts overlay.d/sbin in ${MAGISKTMP}).
+on post-fs-data
+    exec u:r:magisk:s0 root root -- ${MAGISKTMP}/tv_tune.sh early ${MAGISKTMP}
+
+service tv_tune_boot ${MAGISKTMP}/tv_tune.sh boot ${MAGISKTMP}
+    user root
+    seclabel u:r:magisk:s0
+    oneshot
+    disabled
+
+on property:sys.boot_completed=1
+    start tv_tune_boot

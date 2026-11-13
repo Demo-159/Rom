@@ -1,0 +1,11 @@
+# ROM "TV": build.prop changes. "key=value" sets (replacing the line if present); "-key" removes.
+# Branding (white label). The fingerprint, name and device stay as stock: Google services check them.
+ro.product.model=TV
+# Spanish (Chile) and Chile's time zone out of the box.
+ro.product.locale=es-CL
+persist.sys.timezone=America/Santiago
+# ADB stays on, but a computer must be approved on the TV first (stock let anyone on the network in as root).
+ro.adb.secure=1
+-service.adb.tcp.port
+# Less memory for logs.
+persist.logd.size=65536
