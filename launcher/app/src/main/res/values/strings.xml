@@ -324,4 +324,7 @@
     <string name="kids_blocked">%s is not allowed here</string>
     <string name="kids_warn">%d min of TV left</string>
     <string name="kids_warn_break">A break in %d min</string>
+    <string name="phone_page_channel">Phone page</string>
+    <string name="phone_page_active">Phone page is on</string>
+    <string name="phone_page_active_hint">Aerial stays open for 15 minutes so the page you scanned keeps working.</string>
 </resources>

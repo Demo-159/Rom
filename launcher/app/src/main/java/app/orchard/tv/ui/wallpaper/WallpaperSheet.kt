@@ -140,6 +140,7 @@ fun WallpaperSheet(
     LaunchedEffect(visible) {
         if (!visible) return@LaunchedEffect
         val url = withContext(Dispatchers.IO) { PhoneServer.start(context) }
+        if (url != null) app.orchard.tv.wallpaper.PhonePageKeepAlive.start(context)
         phoneUrl = url
         qr = url?.let { withContext(Dispatchers.Default) { PhoneServer.qr(it).asImageBitmap() } }
     }

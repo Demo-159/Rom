@@ -325,4 +325,7 @@
     <string name="kids_blocked">%s no está permitida aquí</string>
     <string name="kids_warn">Quedan %d min de TV</string>
     <string name="kids_warn_break">Descanso en %d min</string>
+    <string name="phone_page_channel">Página del celular</string>
+    <string name="phone_page_active">Página de configuración activa</string>
+    <string name="phone_page_active_hint">Aerial sigue abierto 15 minutos para que funcione la página que escaneaste.</string>
 </resources>
