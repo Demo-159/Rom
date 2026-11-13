@@ -9,3 +9,12 @@ ro.adb.secure=1
 -service.adb.tcp.port
 # Less memory for logs.
 persist.logd.size=65536
+# Graphics caches per app, sized for this box's 720p UI (stock asked up to 64 MB of textures per app).
+ro.hwui.texture_cache_size=24
+ro.hwui.layer_cache_size=16
+ro.hwui.path_cache_size=4
+ro.hwui.r_buffer_cache_size=2
+ro.hwui.drop_shadow_cache_size=2
+ro.hwui.gradient_cache_size=0.5
+# Each app starts with a smaller heap and grows it when it needs to.
+dalvik.vm.heapstartsize=8m

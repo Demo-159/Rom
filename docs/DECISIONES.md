@@ -146,6 +146,18 @@ El detalle está en la sección 3.
 - **Se mantienen:** Play Store, servicios de Google y Play Protect (seguridad).
 - **Paso manual:** el "diagnóstico de uso" de Google no se puede preconfigurar desde la ROM. En el primer arranque: Ajustes → Google → "Uso y diagnóstico" → desactivar.
 
+### 4.9 Revisión de RAM de la ROM (aplicado)
+- **Caché de texturas por app:** el fabricante lo ponía en 64 MB (repetido en `build.prop`, ganaba el último). Ahora son 24 MB, junto con los demás cachés gráficos ajustados a una interfaz de 720p.
+- **Heap inicial de cada app:** de 16 MB a 8 MB. Las apps lo amplían si lo necesitan.
+- **Quitados `VideoPlayer` y `SubTitle`:** SubTitle quedaba siempre en memoria. Se comprobó que nada del sistema depende de él.
+- **Revisado y conservado:**
+  - `droidlogic-res` (persistente): controla la salida de video.
+  - `SystemUI`.
+  - `BluetoothRemote`: para emparejar controles Bluetooth.
+  - El teclado.
+  - Los proveedores de datos, que solo se abren cuando alguien los consulta.
+- **Kernel 3.14 sin KSM:** no hay fusión de páginas. La memoria comprimida (zram, 500 MB) ya está activa.
+
 ## 5. Launcher (pantalla de inicio)
 
 **Decisión: Aerial, modificado a medida e incluido dentro de la ROM.** Reemplaza a GlassTV, que se probó en el emulador y no convenció tanto.

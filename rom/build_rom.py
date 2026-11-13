@@ -75,12 +75,10 @@ def edit_build_prop(path, changes):
             lines = [l for l in lines if not l.startswith(key + "=")]
             continue
         key, value = raw.split("=", 1)
-        for i, l in enumerate(lines):
-            if l.startswith(key + "="):
-                lines[i] = f"{key}={value}"
-                break
-        else:
-            lines.append(f"{key}={value}")
+        # Every line with the key goes (stock sets some twice, and the last one wins); one stays.
+        at = next((i for i, l in enumerate(lines) if l.startswith(key + "=")), None)
+        lines = [l for l in lines if not l.startswith(key + "=")]
+        lines.insert(at if at is not None else len(lines), f"{key}={value}")
     open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
 
 
