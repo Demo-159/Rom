@@ -4,3 +4,8 @@
 *.PARTITION
 work/
 apk/
+launcher/local.properties
+launcher/.gradle/
+launcher/build/
+launcher/app/build/
+launcher/local/
