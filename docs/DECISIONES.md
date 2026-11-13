@@ -77,7 +77,7 @@ Plan técnico, con valores exactos por definir y probar:
 
 ### 4.2 Quitar apps que sobran ✅
 Lista a confirmar antes de compilar:
-- Apps preinstaladas de `/system/fast_preinstall/` (las apps vietnamitas, entre otras) y Netflix de `/system/preinstall/`.
+- Apps preinstaladas de `/system/fast_preinstall/` (las apps vietnamitas, entre otras) y Netflix de `/system/preinstall/`. **Excepción:** `AndroidApp22.apk` (Google para Android TV, búsqueda por voz) se conserva; ver sección 4.6.
 - Chrome duplicado: está en `fast_preinstall` y en `/system/app/Chrome`.
 - Apps de prueba o del fabricante: `FactoryTest_oranth`, `Dig`, `LedStatus` y el launcher `Oranth_Launcher_720P`, que se reemplaza (ver sección 5).
 - Hay que revisar las demás, una por una, antes de borrarlas.
@@ -111,7 +111,9 @@ El detalle está en la sección 3.
   - El kernel original, con los drivers USB HID y de audio USB.
   - Los módulos de audio: `audio.usb.default.so` (la ROM ya declara entrada de micrófono USB en `audio_policy.conf`) y los módulos de mandos de voz `audio.dia_remote.default.so` y `audio.huitong.default.so`, con sus archivos `*_audio_policy_configuration.xml`.
   - Todos los mapas de teclas de `/system/usr/keylayout/`.
-  - **Pendiente:** saber qué app abre hoy el botón del micrófono, para no borrarla o para redirigir el botón a la búsqueda por voz de Google.
+  - **Resuelto: el botón del micrófono abre la búsqueda por voz de Google.** El usuario cree que es así, y la ROM lo confirma. El archivo `/system/fast_preinstall/AndroidApp22.apk` (28 MB) es la app **Google para Android TV** (`com.google.android.katniss`), que trae `VoiceInputActivity` y `HotwordService`. El launcher original también la llama.
+  - **Decisión:** esta app **se conserva** y no entra en la limpieza de `fast_preinstall`. Se le pone un nombre de archivo claro (por ejemplo `GoogleTV_Voz.apk`). Se queda como app instalable, así el Play Store la puede actualizar.
+  - **Pendiente:** revisar si hay una versión más nueva de esta app que funcione en Android 7.1, y comprobar que el launcher nuevo abra la búsqueda por voz con el botón.
 - **Choque con el rendimiento:** la app de Google mantiene servicios en segundo plano y consume RAM. Se instala, pero se ajusta para que no se active sola más de lo necesario.
 
 ## 5. Launcher (pantalla de inicio)
@@ -184,8 +186,8 @@ La ROM final pesa más de 1 GB. GitHub no acepta archivos de más de 100 MB, as�
 
 ## 9. Pendientes (resumen)
 
-- [ ] Comprobar qué versión de la búsqueda por voz de Google para Android TV funciona en 7.1 (sección 4.6).
-- [x] ~~Control con micrófono~~ → **Tiene uno USB que ya funciona.** Falta saber qué app abre su botón de micrófono.
+- [x] ~~Qué búsqueda por voz trae la ROM~~ → **Google para Android TV** (`AndroidApp22.apk`). Se conserva. Falta ver si hay una versión más nueva que funcione en 7.1.
+- [x] ~~Control con micrófono~~ → **Tiene uno USB que ya funciona** y abre la búsqueda por voz de Google.
 
 - [ ] Elegir launcher, priorizando el más ligero.
 - [x] ~~Decidir si se quitan los servicios de Google~~ → **Se conservan.**
