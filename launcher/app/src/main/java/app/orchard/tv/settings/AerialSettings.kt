@@ -131,7 +131,7 @@ object AerialSettings {
     var previewApps by mutableIntStateOf(0)
 
     /** In one-row mode, the top of the second row peeking under the first; off hides it until you go down. */
-    var peekNextRow by mutableStateOf(true); private set
+    var peekNextRow by mutableStateOf(false); private set
 
     /** Interface sounds (system/Sounds), as tvOS plays them on every press. */
     var uiSounds by mutableStateOf(UiSounds.Tv); private set
@@ -154,7 +154,7 @@ object AerialSettings {
     var clockRight by mutableStateOf(false); private set
 
     /** The date and weather over a big clock above the top row, instead of one small line in the corner. */
-    var largeClock by mutableStateOf(false); private set
+    var largeClock by mutableStateOf(true); private set
 
     /**
      * How often "My Photos, in turn" moves to the next photo, in minutes; a day (1440) unless the
@@ -247,10 +247,10 @@ object AerialSettings {
         pinSet = pinHash != null
         pinArrows = prefs.getBoolean("pin_arrows", false)
         oneRowHome = prefs.getBoolean("one_row_home", true)
-        peekNextRow = prefs.getBoolean("peek_next_row", true)
+        peekNextRow = prefs.getBoolean("peek_next_row", false) // ROM "TV": second row hidden by default
         chosenColumns = prefs.getInt("home_columns", DEFAULT_HOME_COLUMNS).takeIf { it in HOME_COLUMNS } ?: DEFAULT_HOME_COLUMNS
         clockRight = prefs.getBoolean("clock_right", false)
-        largeClock = prefs.getBoolean("large_clock", false)
+        largeClock = prefs.getBoolean("large_clock", true) // ROM "TV": large clock by default
         clockHours = ClockHours.of(prefs.getString("clock_hours", null))
         homeLocked = prefs.getBoolean("home_locked", false)
         photoMinutes = prefs.getInt("photo_minutes", DAY_MINUTES).takeIf { it in PHOTO_MINUTES } ?: DAY_MINUTES
