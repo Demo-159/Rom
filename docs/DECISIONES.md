@@ -91,11 +91,14 @@ Lista a confirmar antes de compilar:
 ### 4.4 Rendimiento ✅ (prioridad máxima)
 El detalle está en la sección 3.
 
-### 4.5 Marca propia ✅ (datos pendientes)
-- Nombre del modelo y de la versión en `build.prop`.
-- Logo de arranque (partición `logo`, formato `AML_RES`, imagen `bootup`).
-- Animación de arranque (`/system/media/bootanimation.zip`).
-- **Pendiente:** nombre de la ROM y logo. Si el usuario no trae un logo, se diseña uno sencillo con el nombre.
+### 4.5 Marca: "TV", marca blanca ✅
+**Decisión del usuario: la ROM se llama simplemente "TV", sin marca propia (marca blanca).**
+
+- **Nombre visible:** "TV" en *Acerca de*, en el nombre del dispositivo en la red y en Bluetooth, y en el launcher. Se cambian `ro.product.model=TV` y el nombre del dispositivo.
+- **Lo que no se toca:** `ro.build.fingerprint`, `ro.product.name` y `ro.product.device` (`p281`) se quedan como en la original. El Play Store y los servicios de Google usan esos datos; cambiarlos puede romper el inicio de sesión o la compatibilidad de apps.
+- **Logo de arranque** (partición `logo`, imagen `bootup`): neutro, solo "TV" en blanco sobre fondo negro, sin el logo del fabricante.
+- **Animación de arranque** (`/system/media/bootanimation.zip`): neutra y corta, por rendimiento.
+- Se quitan las referencias visibles a Oranth y Tanix en lo que vea el usuario.
 
 ### 4.6 Asistente de Google (solicitado, con límites)
 **Lo que pide el usuario:** un asistente de Google bueno, rápido y moderno.
@@ -204,7 +207,7 @@ Opciones que se evaluaron:
 
 - [x] ~~Elegir launcher~~ → **GlassTV modificado.** Falta definir las modificaciones.
 - [x] ~~Decidir si se quitan los servicios de Google~~ → **Se conservan.**
-- [ ] Nombre de la ROM y logo.
+- [x] ~~Nombre de la ROM y logo~~ → **"TV", marca blanca**, con logo neutro.
 - [x] ~~Forma de entrega~~ → **Descarga temporal.** Falta elegir el servicio al momento de subir.
 - [ ] Lista final de apps a borrar.
 - [ ] Valores de rendimiento.
