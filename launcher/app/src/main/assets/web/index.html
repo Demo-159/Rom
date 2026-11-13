@@ -1895,6 +1895,8 @@ async function sendPhotos(files) {
 /* Screensaver tab. */
 let sendingVideo = '';
 function renderScreensaver() {
+  // ROM "TV": no aerial films on this TV.
+  const aerialBtn = document.querySelector('#ss [data-mode="aerial"]'); if (aerialBtn) aerialBtn.hidden = state.aerialFilms === false;
   document.querySelectorAll('#ss [data-mode]').forEach(b => b.setAttribute('aria-checked', b.dataset.mode === state.screensaver ? 'true' : 'false'));
   $('#ssFoot').textContent = state.screensaverFollows ? t('hint_follows') : state.screensaver === 'system' ? hints.system : '';
   $('#ssFoot').hidden = !$('#ssFoot').textContent;

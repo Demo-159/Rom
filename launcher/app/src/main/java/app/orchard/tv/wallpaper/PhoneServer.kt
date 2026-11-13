@@ -244,7 +244,7 @@ class PhoneServer private constructor(private val context: Context, private val 
     private fun state(): JSONObject {
         val list = JSONArray()
         val selected = Wallpapers.selectedId
-        Wallpapers.items.forEach { w ->
+        Wallpapers.items.filter { app.orchard.tv.RomFlags.AERIAL_FILMS || it.kind != WallpaperKind.Live }.forEach { w ->
             list.put(JSONObject().put("id", w.id).put("kind", w.kind.name.lowercase()).put("title", w.title).put("caption", w.caption ?: ""))
         }
         return JSONObject()
@@ -270,7 +270,8 @@ class PhoneServer private constructor(private val context: Context, private val 
             })
             .put("videoRoom", ScreensaverVideos.room(context))
             .put("focusStyle", AerialSettings.focusStyle.key)
-            .put("kids", kidsState())
+            .put("kids", if (app.orchard.tv.RomFlags.KIDS) kidsState() else JSONObject())
+            .put("aerialFilms", app.orchard.tv.RomFlags.AERIAL_FILMS)
             .put("wallpaperAlwaysMoves", AerialSettings.wallpaperAlwaysMoves)
             .put("showWeather", AerialSettings.showWeather)
             .put("screensaverClock", AerialSettings.screensaverClock)

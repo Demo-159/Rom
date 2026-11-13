@@ -168,6 +168,7 @@
 
         <service
             android:name=".guard.RevivalListener"
+            android:enabled="false"
             android:directBootAware="true"
             android:label="@string/guard_name"
             android:exported="true"
@@ -179,6 +180,7 @@
 
         <service
             android:name=".guard.RevivalSyncService"
+            android:enabled="false"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -190,6 +192,7 @@
 
         <service
             android:name=".guard.RevivalAccountService"
+            android:enabled="false"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -201,6 +204,7 @@
 
         <service
             android:name=".guard.HomeGuardService"
+            android:enabled="false"
             android:directBootAware="true"
             android:label="@string/guard_name"
             android:exported="true"

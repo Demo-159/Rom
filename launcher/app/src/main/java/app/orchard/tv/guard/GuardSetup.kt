@@ -474,6 +474,7 @@ object GuardSetup {
      * makes Android bind it again.
      */
     fun rebindIfStalled(context: Context) {
+        if (!app.orchard.tv.RomFlags.GUARD) return
         if (HomeGuardService.isRunning) return
         rescanIfMissing(context)
         if (standingOut(context)) { watchScreenOn(context); return }
@@ -722,6 +723,7 @@ object GuardSetup {
     }
 
     fun ensureEnabled(context: Context): Boolean {
+        if (!app.orchard.tv.RomFlags.GUARD) return false
         ensureAdb(context)
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_SECURE_SETTINGS) != PackageManager.PERMISSION_GRANTED) return false
         restoreReceivers(context)

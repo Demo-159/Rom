@@ -1,5 +1,7 @@
 package app.orchard.tv.wallpaper
 
+import app.orchard.tv.RomFlags
+
 import android.content.Context
 import android.os.Build
 import android.graphics.Bitmap
@@ -128,10 +130,13 @@ object Wallpapers {
      * from that picture.
      */
     val screensaver: ScreensaverMode
-        get() = chosenScreensaver ?: when {
+        get() = (chosenScreensaver ?: when {
             isVideo(selectedId) -> ScreensaverMode.Videos
             selectedId == LIVE || selectedId == AUTO || isSource(selectedId) -> ScreensaverMode.Aerial
             else -> ScreensaverMode.Photos
+        }).let {
+            // ROM "TV": without the aerial films, photos take their place.
+            if (it == ScreensaverMode.Aerial && !RomFlags.AERIAL_FILMS) ScreensaverMode.Photos else it
         }
 
     /** A wallpaper that moves behind Home (aerial films, the owner's videos), with a frame as its picture. */

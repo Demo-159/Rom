@@ -135,6 +135,8 @@ fun WallpaperSheet(
     var qr by remember { mutableStateOf<ImageBitmap?>(null) }
 
     BackHandler(enabled = visible, onBack = onDismiss)
+    // ROM "TV": the thumbnails (about 330 KB each) are only for this sheet; let them go once it closes.
+    LaunchedEffect(visible) { if (!visible) Wallpapers.trimMemory() }
 
     // The phone page listens all along (PhoneServer.listen); the address is read again each time,
     // as the TV's may have changed.
@@ -334,7 +336,7 @@ fun WallpaperSheet(
                     ) { ScreensaverChoice(onStartScreensaver) }
                     // Only the qualities this TV can play; a 1080p-only TV has nothing to choose.
                     val qualities = remember { AerialFormats.supported(context) }
-                    if (qualities.size > 1) {
+                    if (app.orchard.tv.RomFlags.AERIAL_FILMS && qualities.size > 1) {
                         // The films kept on the TV (AerialSet, AerialStream): how many, how much
                         // space at most, and how they change. In place of the quality's own note,
                         // as a note shows two lines at most.
@@ -396,7 +398,7 @@ fun WallpaperSheet(
                     SettingRow(R.string.st_pin, null, note, first = true) {
                         PinChoice(onPin, onFocused = { scope.launch { scroll.animateScrollTo(scroll.maxValue) } })
                     }
-                    SettingRow(R.string.st_kids, stringResource(R.string.st_kids_hint), note) {
+                    if (app.orchard.tv.RomFlags.KIDS) SettingRow(R.string.st_kids, stringResource(R.string.st_kids_hint), note) {
                         // The last row that takes focus: bring the note under it into view too.
                         Box(Modifier.onFocusChanged { if (it.hasFocus) scope.launch { scroll.animateScrollTo(scroll.maxValue) } }) {
                             ActionChip(
@@ -456,7 +458,7 @@ private fun WallpaperRows(takeFocus: Boolean) {
     val collectionsTitle = stringResource(R.string.wp_collections)
     val list = remember(items, selected, dailyTitle, rotateTitle, videosTitle, collectionsTitle) {
         buildList {
-            addAll(items.filter { it.kind == WallpaperKind.Live })
+            if (app.orchard.tv.RomFlags.AERIAL_FILMS) addAll(items.filter { it.kind == WallpaperKind.Live })
             // Each video on its own, and with two or more one card that plays them in turn (#762).
             val videos = items.filter { it.kind == WallpaperKind.Video && it.id != Wallpapers.VIDEOS }
             if (videos.size > 1 || selected == Wallpapers.VIDEOS) add(Wallpaper(Wallpapers.VIDEOS, WallpaperKind.Video, videosTitle))
@@ -774,7 +776,7 @@ private fun ScreensaverChoice(onStart: () -> Unit) {
             ScreensaverMode.Clock to R.string.ss_clock,
             ScreensaverMode.Videos to R.string.ss_videos,
             ScreensaverMode.System to R.string.ss_system,
-        ).forEach { (mode, label) ->
+        ).filter { app.orchard.tv.RomFlags.AERIAL_FILMS || it.first != ScreensaverMode.Aerial }.forEach { (mode, label) ->
             Chip(stringResource(label), on = Wallpapers.screensaver == mode) { Wallpapers.chooseScreensaver(mode) }
         }
         Spacer(Modifier.width(6.dp))

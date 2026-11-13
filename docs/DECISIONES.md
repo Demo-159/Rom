@@ -154,6 +154,16 @@ El detalle está en la sección 3.
 
 El launcher del fabricante (`Oranth_Launcher_720P`) se reemplaza.
 
+### Optimización de RAM del launcher (aplicada)
+Medido en el emulador de Android TV 7.1: Aerial usa **~45 MB** (PSS) en el inicio, frente a ~30 MB del launcher de Android TV. Cambios hechos sin alterar lo que se ve:
+1. **Mosaicos al tamaño real:** las imágenes de cada app se guardan al tamaño en píxeles del mosaico seleccionado (235 px de ancho en 720p) en vez de un mínimo fijo de 352 px. Son ~55 % menos de memoria por app.
+2. **Miniaturas de Personalizar:** se liberan al cerrar Personalizar.
+3. **Funciones quitadas** (`launcher/app/src/main/java/app/orchard/tv/RomFlags.kt`; se reactivan cambiando la constante):
+   - `AERIAL_FILMS = false`: sin videos aéreos de Apple como fondo ni como salvapantallas. Las fotos los reemplazan.
+   - `KIDS = false`: sin modo niños y mayores.
+   - `GUARD = false`: sin guardián de inicio, escucha de notificaciones ni cuenta de sincronización. En la ROM Aerial es la pantalla de inicio del sistema y no los necesita. Además van desactivados en el manifiesto.
+
+
 ### Requisitos
 - **Consumir lo mínimo de RAM y CPU** (sección 3). Con fondo estático, sin animaciones de fondo.
 - Funcionar en **Android 7.1** (API 25). Varios launchers modernos piden Android 8 o 9.

@@ -102,7 +102,9 @@ object TileArtFactory {
      */
     fun fitColumns(): Boolean {
         val dp = if (AerialSettings.homeColumns == 4) 222 else 176
-        val w = (dp * density).roundToInt().coerceIn(352, 888)
+        // ROM "TV": no 352 px floor. On a 720p TV the focused tile is 235 px; drawing it at 352
+        // kept 2.25× the pixels in memory for every app, for no visible gain.
+        val w = (dp * density).roundToInt().coerceIn(160, 888)
         if (w == W) return false
         W = w
         H = W * 9 / 16
