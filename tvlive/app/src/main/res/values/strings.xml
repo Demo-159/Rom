@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TV en vivo</string>
+    <string name="loading">Cargando…</string>
+    <string name="unavailable">Canal no disponible. Reintentando…</string>
+    <string name="empty">No hay canales. Agrega uno.</string>
+    <string name="external">Enlace</string>
+    <string name="add">+ Agregar canal</string>
+    <string name="add_title">Agregar canal</string>
+    <string name="name_hint">Nombre (por ejemplo: MEGA)</string>
+    <string name="url_hint">Enlace m3u8</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Borrar</string>
+    <string name="delete_title">¿Borrar %1$s?</string>
+    <string name="channel_n">Canal %1$d</string>
+    <string name="bad_url">El enlace debe empezar con http:// o https://</string>
+</resources>

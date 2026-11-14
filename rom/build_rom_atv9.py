@@ -3,7 +3,7 @@
 
 The base is a real Android TV 9 (Google's TV Play Store, Play services, setup, voice search and
 TV Settings), so only what makes it this ROM goes on top: Aerial as the only home screen,
-TizenTube as YouTube, less bloat, white label "TV", the dots boot animation, a black logo and the
+TizenTube as YouTube, the "TV en vivo" m3u8 player, less bloat, white label "TV", the dots boot animation, a black logo and the
 memory tuning. Verified boot is off in its vbmeta and its fstab has no verity, so the system and
 vendor images can change; the boot image is left as it is.
 
@@ -16,6 +16,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_rom as b  # noqa: E402  (the stock-based build's helpers)
 
 ATV9 = os.path.join(b.ROM, "atv9")
+# "TV en vivo": the m3u8 player (tvlive/), MEGA as its first channel.
+TVLIVE_APK = os.path.join(b.ROOT, "tvlive", "app", "build", "outputs", "apk", "release", "app-release.apk")
 
 
 def debloat(root):
@@ -69,6 +71,7 @@ def build_system(parts, work):
         # Stands in for YouTube (same package name; no YouTube in this base) and hands voice search
         # results to TizenTube.
         b.install_app(sysdir, "app/YouTubeBridge", os.path.join(b.ROM, "prebuilt", "YouTubeBridge.apk"), extract_libs=False)
+        b.install_app(sysdir, "app/TvEnVivo", TVLIVE_APK, extract_libs=False)
         copy_tree(os.path.join(ATV9, "overlay"), root)
         b.run(sys.executable, os.path.join(b.ROM, "tools", "make_bootanim.py"), work)
         anim = os.path.join(sysdir, "media", "bootanimation.zip")
@@ -105,8 +108,9 @@ def main():
     if os.geteuid() != 0:
         sys.exit("run as root (the images are mounted)")
     base, out = sys.argv[1], sys.argv[2]
-    if not os.path.exists(b.AERIAL_APK):
-        sys.exit("missing " + b.AERIAL_APK)
+    for apk in (b.AERIAL_APK, TVLIVE_APK):
+        if not os.path.exists(apk):
+            sys.exit("missing " + apk)
     work = tempfile.mkdtemp(prefix="tvrom9-", dir=os.path.dirname(os.path.abspath(out)))
     parts = os.path.join(work, "parts")
     b.run(sys.executable, b.UNPACK, "unpack", base, parts)

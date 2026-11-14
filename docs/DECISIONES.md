@@ -324,3 +324,11 @@ El usuario notaba todo lento después de horas encendido y no puede hacer prueba
 - **Apps en segundo plano:** máximo 16 en caché (`activity_manager_constants`, lo aplica Aerial en el primer arranque).
 - **Aerial:** efectos "Lite" por defecto (`AerialSettings`); se pueden cambiar en Personalizar.
 - **Quitado:** Android TV Core Services (TVRecommendations), que solo alimentaba las recomendaciones del launcher de Google.
+
+## App "TV en vivo" (reproductor m3u8)
+
+- **Pedido:** un reproductor de m3u8 que venga con la ROM, con la imagen estirada a toda la pantalla, con MEGA (`https://tv-mgmt.gtd.cl/bpk-tv/MEGA/default/index.m3u8`) como canal por defecto y la posibilidad de agregar más.
+- **App:** `tvlive/` (paquete `tv.rom.live`, 600 KB). Usa vistas nativas y Media3 ExoPlayer con HLS. La superficie de video ocupa toda la pantalla y el video se escala a ella, sin respetar la proporción: queda estirado y sin barras negras. El reproductor solo existe mientras la app está en pantalla.
+- **Control remoto:** arriba/abajo (o Canal +/-) cambian de canal; OK, Menú o izquierda abren la lista; la última fila agrega un canal (nombre y enlace); una pulsación larga borra uno. Recuerda el último canal visto. Si un canal falla, reintenta cada 5 s. También abre enlaces m3u8 que le pasen otras apps.
+- **En la ROM:** `system/app/TvEnVivo`.
+- **Nota:** desde el servidor de compilación (fuera de Chile) el enlace de MEGA responde 403, porque parece restringido a Chile o a la red de GTD. La app se probó en el emulador de Android TV con una señal m3u8 local: lista, agregar canal y aviso de "no disponible". El decodificador por software del emulador no reproduce video, pero el TV box decodifica por hardware.

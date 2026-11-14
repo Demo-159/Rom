@@ -10,3 +10,8 @@ launcher/build/
 launcher/app/build/
 launcher/local/
 __pycache__/
+tvlive/local.properties
+tvlive/.gradle/
+tvlive/build/
+tvlive/app/build/
+.kotlin/
