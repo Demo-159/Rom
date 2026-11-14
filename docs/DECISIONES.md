@@ -299,7 +299,7 @@ Opciones que se evaluaron:
 - **Por qué es mejor base:** es Android TV 9 de verdad, con Play Store de TV, servicios de Google para TV, asistente de inicio de sesión de Android TV (SetupWraith), búsqueda por voz (Katniss) y Configuración de Android TV. Lo que en la base de fábrica (Android 7.1) había que parchar ya viene.
 - **Seguridad de la base:** la verificación de arranque está desactivada en su `vbmeta` (flags 2) y su fstab no usa verity, así que `system` y `vendor` se pueden modificar. El `boot.img` no se toca.
 - **Script:** `rom/build_rom_atv9.py` (reutiliza las funciones de `rom/build_rom.py`). Archivos en `rom/atv9/`.
-- **Quitado** (`rom/atv9/debloat.txt`): Android TV Home, su personalizador y App Drawer (Aerial es el único launcher), los protectores de pantalla Dreamx, Mi Wallpaper Carousel y Backdrop (unos 75 MB), Cámara, Live Channels, explorador de archivos de Xiaomi, SetOrientation, BugReportSender y la sincronización de Calendario y Contactos.
+- **Quitado** (`rom/atv9/debloat.txt`): Android TV Home, su personalizador y App Drawer (Aerial es el único launcher), los protectores de pantalla Dreamx, Mi Wallpaper Carousel y Backdrop (unos 75 MB), Cámara, Live Channels, SetOrientation, BugReportSender y la sincronización de Calendario y Contactos.
 - **Agregado:** Aerial (priv-app), TizenTube como "YouTube", el puente de voz `YouTubeBridge`, la animación de puntos y el logo negro.
 - **Marca blanca:** `ro.product.model`, `ro.product.vendor.model` y `ro.build.display.id` pasan a "TV". La huella (`ro.build.fingerprint`), el nombre y el dispositivo se mantienen, porque la certificación de Google Play depende de ellos.
 - **Idioma y zona:** es-CL, America/Santiago.
@@ -330,5 +330,10 @@ El usuario notaba todo lento después de horas encendido y no puede hacer prueba
 - **Pedido:** un reproductor de m3u8 que venga con la ROM, con la imagen estirada a toda la pantalla, con MEGA (`https://tv-mgmt.gtd.cl/bpk-tv/MEGA/default/index.m3u8`) como canal por defecto y la posibilidad de agregar más.
 - **App:** `tvlive/` (paquete `tv.rom.live`, 600 KB). Usa vistas nativas y Media3 ExoPlayer con HLS. La superficie de video ocupa toda la pantalla y el video se escala a ella, sin respetar la proporción: queda estirado y sin barras negras. El reproductor solo existe mientras la app está en pantalla.
 - **Control remoto:** arriba/abajo (o Canal +/-) cambian de canal; OK, Menú o izquierda abren la lista; la última fila agrega un canal (nombre y enlace); una pulsación larga borra uno. Recuerda el último canal visto. Si un canal falla, reintenta cada 5 s. También abre enlaces m3u8 que le pasen otras apps.
-- **En la ROM:** `system/app/TvEnVivo`.
+- **En la ROM:** al final no; el usuario prefirió dejarla fuera. La app sigue en `tvlive/` y se puede instalar sola (`apk/TV-en-vivo.apk`).
 - **Nota:** desde el servidor de compilación (fuera de Chile) el enlace de MEGA responde 403, porque parece restringido a Chile o a la red de GTD. La app se probó en el emulador de Android TV con una señal m3u8 local: lista, agregar canal y aviso de "no disponible". El decodificador por software del emulador no reproduce video, pero el TV box decodifica por hardware.
+
+## Explorador de archivos
+
+- **Pedido:** una app para ver archivos y pendrives.
+- **Decisión:** se mantiene el explorador que trae la base (`MiFileExplorer`, paquete `com.anker.fileexplorer`), que antes se quitaba. Está hecho para TV, aparece en el launcher como "Gestor de archivos", abre memorias USB y puede instalar APKs.

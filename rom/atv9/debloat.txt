@@ -8,10 +8,9 @@ system/app/AppDrawer
 system/priv-app/Dreamx
 system/priv-app/MiTVDream
 system/priv-app/Backdrop
-# Apps a TV box without a camera or tuner does not use.
+# Apps a TV box without a camera or tuner does not use. (The file explorer, MiFileExplorer, stays: USB sticks and APKs.)
 system/app/Camera2
 system/priv-app/TV
-system/priv-app/MiFileExplorer
 system/priv-app/SetOrientation
 system/app/BugReportSender
 system/app/GoogleCalendarSyncAdapter
