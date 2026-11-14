@@ -34,6 +34,19 @@ def debloat(root):
             print("  (not found)", p)
 
 
+def update_remote_service(sysdir):
+    """Android TV Remote Service 5.2 (rom/prebuilt/AtvRemoteService.apk) in place of the base's 4.1:
+    the Google TV app on a phone, the owner's only remote, does not find a box with 4.x. Only if
+    Google signed it like the one in the base."""
+    apk = os.path.join(b.ROM, "prebuilt", "AtvRemoteService.apk")
+    target = os.path.join(sysdir, "priv-app", "AtvRemoteService", "AtvRemoteService.apk")
+    want, got = b.stock_cert(target), b.apk_cert(apk)
+    if not want or got != want:
+        sys.exit(f"AtvRemoteService.apk is not signed like the base's ({got} vs {want}): refusing it")
+    b.install_app(sysdir, "priv-app/AtvRemoteService", apk, extract_libs=False)
+    print("  Android TV Remote Service updated", flush=True)
+
+
 def copy_tree(src, dst_root):
     for base, _, files in os.walk(src):
         for f in files:
@@ -64,6 +77,7 @@ def build_system(parts, work):
         sysdir = os.path.join(mnt, "system")
         debloat(root)
         b.install_app(sysdir, "priv-app/Aerial", b.AERIAL_APK, extract_libs=True)
+        update_remote_service(sysdir)
         tt = b.fetch(b.TIZENTUBE_URL, os.path.join(work, "TizenTube.apk"))
         b.install_app(sysdir, "app/TizenTube", tt, extract_libs=True)
         # Stands in for YouTube (same package name; no YouTube in this base) and hands voice search

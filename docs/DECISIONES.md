@@ -368,3 +368,9 @@ El usuario notaba todo lento después de horas encendido y no puede hacer prueba
 - **Android TV Remote Service:** se quitó y luego se **devolvió**. El usuario perdió el control y la app Google TV del celular funciona como control a través de este servicio. No volver a quitarlo.
 - **No se tocó** `miracast_hdcp2`: está declarado en el manifiesto VINTF y quien lo pida esperaría para siempre (la misma lección que `cameraserver`). Tampoco se tocaron los servicios de Amlogic, porque casi todos ya están `disabled`/`oneshot` y solo arrancan a pedido.
 - **Límites reales:** casi toda la RAM la usan los servicios de Google, la Play Store, la búsqueda por voz y Gboard, que el usuario quiere conservar. El tiempo de arranque es sobre todo kernel, Zygote y revisión de paquetes; no hay más palancas seguras sin tocar `boot.img`.
+
+## Control desde el celular (Android TV Remote Service 5.2)
+
+- **Problema:** el usuario perdió el control. La app Google TV del celular no encontraba el TV box (sí encontraba otro deco de la casa). La base trae Android TV Remote Service 4.1 (2020), y la app usa el protocolo nuevo, que llegó con la versión 5.0 (septiembre de 2021).
+- **Solución:** `rom/prebuilt/AtvRemoteService.apk` (5.2.473254133, mínimo Android 7, sin bibliotecas nativas), enviado por el usuario desde APKMirror. Reemplaza al 4.1 en `priv-app/AtvRemoteService` (`update_remote_service` en `build_rom_atv9.py`) solo si está firmado con la misma clave de Google que el original (comprobado: `456edbc3…9137`). Ninguna de las dos versiones usa `sharedUserId` y la base no exige listas blancas de permisos.
+- **Uso sin control tras flashear:** cable de red al TV box y la app Google TV en un celular conectado al Wi-Fi del mismo router. No está comprobado que responda durante el asistente inicial; el respaldo es un mouse USB.
