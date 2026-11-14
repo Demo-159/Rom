@@ -96,9 +96,55 @@ def build_vendor(parts, work):
         text = open(fstab, encoding="utf-8").read()
         assert "zramsize=268435456" in text, "zram line not as expected"
         open(fstab, "w", encoding="utf-8").write(text.replace("zramsize=268435456", "zramsize=536870912"))
+        add_tuning(mnt)
+        check_policy(parts, work, mnt)
     finally:
         b.run("umount", mnt)
     finish_ext4(raw)
+
+
+def put(src, dst, mode, gid, context):
+    shutil.copy(src, dst)
+    os.chown(dst, 0, gid)
+    os.chmod(dst, mode)
+    b.run("setfattr", "-n", "security.selinux", "-v", context, dst)
+
+
+def add_tuning(vendor):
+    """The speed and memory tuning: its script and init file, and its SELinux domain (tvtune).
+    A user build with SELinux enforcing: init itself may not write most of these settings, and a
+    script needs a domain of its own (rom/atv9/sepolicy/tvtune.cil)."""
+    src = os.path.join(ATV9, "vendor")
+    put(os.path.join(src, "bin", "tv_tune.sh"), os.path.join(vendor, "bin", "tv_tune.sh"),
+        0o755, 2000, "u:object_r:tvtune_exec:s0")
+    put(os.path.join(src, "etc", "init", "tv_tune.rc"), os.path.join(vendor, "etc", "init", "tv_tune.rc"),
+        0o644, 0, "u:object_r:vendor_configs_file:s0")
+    cil = os.path.join(vendor, "etc", "selinux", "vendor_sepolicy.cil")
+    with open(cil, "a", encoding="utf-8") as f:
+        f.write("\n" + open(os.path.join(ATV9, "sepolicy", "tvtune.cil"), encoding="utf-8").read())
+    fc = os.path.join(vendor, "etc", "selinux", "vendor_file_contexts")
+    with open(fc, "a", encoding="utf-8") as f:
+        f.write("/vendor/bin/tv_tune\\.sh\t\tu:object_r:tvtune_exec:s0\n")
+
+
+def check_policy(parts, work, vendor):
+    """Compiles the SELinux policy the way init does at every boot on this base (it has no
+    precompiled policy): a policy that does not compile would leave the box unable to start."""
+    sysmnt = os.path.join(work, "system-ro")
+    os.makedirs(sysmnt, exist_ok=True)
+    b.run("mount", "-o", "loop,ro", os.path.join(parts, "system.PARTITION"), sysmnt)
+    try:
+        sel = os.path.join(sysmnt, "system", "etc", "selinux")
+        args = ["secilc", os.path.join(sel, "plat_sepolicy.cil"), "-m", "-M", "true", "-G", "-N", "-c", "30",
+                os.path.join(sel, "mapping", "28.0.cil"),
+                os.path.join(vendor, "etc", "selinux", "plat_pub_versioned.cil"),
+                os.path.join(vendor, "etc", "selinux", "vendor_sepolicy.cil"),
+                "-o", os.path.join(work, "policy.bin"), "-f", "/dev/null"]
+        if subprocess.run(args).returncode != 0:
+            sys.exit("the SELinux policy with the tvtune domain does not compile: not building this image")
+        print("  SELinux policy compiles with the tvtune domain", flush=True)
+    finally:
+        b.run("umount", sysmnt)
 
 
 def main():

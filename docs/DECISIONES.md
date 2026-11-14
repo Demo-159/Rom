@@ -344,3 +344,16 @@ El usuario notaba todo lento después de horas encendido y no puede hacer prueba
 - **Causa probable:** el control del usuario es USB, con un receptor de 2,4 GHz y micrófono. En suspensión profunda el S905W deja sin energía los puertos USB, así que el receptor no puede despertar al equipo. Un control infrarrojo sí lo despertaría, porque eso lo maneja el procesador de bajo consumo.
 - **Solución:** Aerial (`system/KeepAwake.kt`, `RomFlags.KEEP_AWAKE`) mantiene un wakelock parcial desde un servicio en primer plano, que arranca al encender y al abrir Home. El botón apaga la imagen, pero el kernel no entra en suspensión, el control USB sigue con energía y su botón de encendido vuelve a prender la pantalla. Con la pantalla apagada la CPU queda en su velocidad mínima: consume algo más que en suspensión profunda, pero poco.
 - **Por qué en Aerial:** en esta base, init solo puede cambiar atributos de `/sys/power/wake_lock` (`setattr`), no escribir en él. `system_server` sí puede, y lo hace por las apps.
+
+### Optimización con dominio SELinux propio (`tvtune`)
+
+- **Hallazgo:** en esta base init solo puede escribir en `page-cluster` y en los ajustes de zram. La política lo prohíbe (`neverallow init sysfs`) y no hay reglas para la CPU, `swappiness`, la memoria interna ni `/sys/power/wake_lock`. Los ajustes de la versión anterior en `/system/etc/init/tv_tune.rc` casi no tenían efecto y se quitaron.
+- **Solución:** un dominio propio y mínimo, `tvtune` (`rom/atv9/sepolicy/tvtune.cil`, copiado del dominio `firmload` de la base), que se agrega a `vendor_sepolicy.cil`. Esta base no trae política precompilada, así que init compila la política en cada arranque desde esos archivos (con `-N`, como confirma que la política de Aidan solo compila así). El script `/vendor/bin/tv_tune.sh` (`tvtune_exec`) lo arranca `/vendor/etc/init/tv_tune.rc` al terminar el arranque.
+- **Seguridad del cambio:** `build_rom_atv9.py` compila la política completa igual que el TV box (`secilc … -m -M true -G -N -c 30`) y no genera la imagen si falla. También se revisó con un analizador de CIL que el dominio tiene justo los permisos que usa (shell de vendor, bibliotecas, `/proc`, `/sys`, wakelock y zram) y que init puede arrancarlo. Las construcciones usadas ya existen en la política de la base.
+- **El script aplica:**
+  - un wakelock del kernel, que reemplaza en lo esencial al servicio de Aerial (`KeepAwake`, que queda como respaldo) para que el control USB pueda volver a encender el equipo;
+  - `swappiness` 100, `page-cluster` 0 y `vfs_cache_pressure` 60;
+  - el regulador `interactive` más ágil;
+  - `deadline` y 512 KB de lectura anticipada en la eMMC.
+- **zram con LZ4:** init lo pide en `post-fs-data`, antes del `swapon_all` del vendor. Si el kernel no tiene LZ4, queda LZO.
+- **`sys.use_fifo_ui=1`:** la app en pantalla dibuja con prioridad de tiempo real (Android 9).

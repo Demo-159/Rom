@@ -1,0 +1,14 @@
+# ROM "TV": speed and memory tuning (/vendor/bin/tv_tune.sh, SELinux domain tvtune).
+service tv_tune /vendor/bin/tv_tune.sh
+    user root
+    group root
+    oneshot
+    disabled
+
+on post-fs-data
+    # zram with LZ4 where the kernel has it: decompresses about twice as fast as LZO. Set before the
+    # vendor's swapon_all (at boot_completed), as the algorithm cannot change once zram is in use.
+    write /sys/block/zram0/comp_algorithm lz4
+
+on property:sys.boot_completed=1
+    start tv_tune

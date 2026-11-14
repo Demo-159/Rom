@@ -1,0 +1,33 @@
+; ROM "TV": a small domain for the speed and memory tuning (/vendor/bin/tv_tune.sh), started by
+; init once Android has started. Modelled on the base's own "firmload" domain. It may run the
+; vendor shell, read memory figures, and write the CPU governor's tunables, the eMMC queue, swap
+; and zram settings, and a kernel wake lock; nothing else. Appended to vendor_sepolicy.cil, which
+; init compiles at every boot (this base has no precompiled policy).
+(type tvtune)
+(roletype object_r tvtune)
+(type tvtune_exec)
+(roletype object_r tvtune_exec)
+(typeattributeset domain (tvtune))
+(typeattributeset file_type (tvtune_exec))
+(typeattributeset exec_type (tvtune_exec))
+(typeattributeset vendor_file_type (tvtune_exec))
+(allow init_28_0 tvtune_exec (file (read getattr map execute open)))
+(allow init_28_0 tvtune (process (transition)))
+(allow tvtune tvtune_exec (file (read getattr map execute entrypoint open)))
+(dontaudit init_28_0 tvtune (process (noatsecure)))
+(allow init_28_0 tvtune (process (siginh rlimitinh)))
+(typetransition init_28_0 tvtune_exec process tvtune)
+(allow tvtune vendor_shell_exec_28_0 (file (read getattr map execute open)))
+(allow tvtune rootfs_28_0 (lnk_file (getattr read)))
+(allow tvtune proc_meminfo_28_0 (file (read getattr open)))
+(allow tvtune proc_28_0 (file (read write getattr open)))
+(allow tvtune proc_page_cluster_28_0 (file (read write getattr open)))
+(allow tvtune sysfs_28_0 (dir (read getattr search open)))
+(allow tvtune sysfs_28_0 (lnk_file (read getattr)))
+(allow tvtune sysfs_28_0 (file (read write getattr open)))
+(allow tvtune sysfs_devices_system_cpu_28_0 (dir (read getattr search open)))
+(allow tvtune sysfs_devices_system_cpu_28_0 (file (read write getattr open)))
+(allow tvtune sysfs_power_28_0 (dir (read getattr search open)))
+(allow tvtune sysfs_wake_lock_28_0 (file (read write getattr open)))
+(allow tvtune sysfs_zram_28_0 (dir (read getattr search open)))
+(allow tvtune sysfs_zram_28_0 (file (read write getattr open)))
