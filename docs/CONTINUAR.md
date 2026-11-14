@@ -32,7 +32,7 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
 
 ## Estado (2026-11-14)
 
-- **Última ROM entregada:** https://gofile.io/d/jTZhRxRU (MD5 del zip `883c91d1896acb99d80f811961d2c556`). No se ha probado en el equipo.
+- **Última ROM entregada:** https://gofile.io/d/LTwU8dPg (MD5 del zip `aca08c3cd6e5af1a06a7caafce69b423`). No se ha probado en el equipo.
   - Arreglo del control USB: wakelock del kernel y `KeepAwake` de Aerial como respaldo.
   - Dominio SELinux `tvtune` con los ajustes de CPU, memoria y eMMC.
   - zram con LZ4 y `sys.use_fifo_ui`.
