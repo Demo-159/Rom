@@ -33,6 +33,9 @@ object RomSetup {
         secure("backup_enabled", "0")
         // Wi-Fi for Chile: the 5 GHz channels the country allows.
         global("wifi_country_code", "CL")
+        // Fewer apps kept in the background (Android's default is 32): with 2 GB they only fill
+        // the compressed memory, and compressing them costs the CPU the menus need.
+        global("activity_manager_constants", "max_cached_processes=16")
         // Standby after 3 hours without use (one of the choices in Settings, so it can be changed there).
         system(Settings.System.SCREEN_OFF_TIMEOUT, "10800000")
         if (global(DONE, "1").getOrDefault(false)) DiagLog.i("ROM first-boot settings applied")

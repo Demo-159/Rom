@@ -1,7 +1,8 @@
 # ROM "TV" on Aidan's ROM v9 (Android TV 9): paths inside the system image (system-as-root).
-# Launchers and their helpers: Aerial is the only home screen.
+# Launchers and their helpers (Android TV Core Services fed only Google's home): Aerial is the only home screen.
 system/priv-app/TVLauncher
 system/priv-app/MiTvSetupCustomizer
+system/priv-app/TVRecommendations
 system/app/AppDrawer
 # Screensavers: Aerial has its own (photo collections), no 70 MB of film/ambient apps.
 system/priv-app/Dreamx

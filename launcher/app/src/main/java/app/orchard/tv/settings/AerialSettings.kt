@@ -268,7 +268,8 @@ object AerialSettings {
         backStartsScreensaver = prefs.getBoolean("back_starts_screensaver", true)
         screensaverMinutes = prefs.getInt("screensaver_minutes", DEFAULT_SCREENSAVER_MINUTES)
         aerialQuality = AerialQuality.of(prefs.getString("aerial_quality", null))
-        effects = Effects.of(prefs.getString("effects", null))
+        // ROM "TV": light effects unless chosen otherwise (Mali-450 on the TX3 Mini).
+        effects = Effects.of(prefs.getString("effects", Effects.Lite.key))
         lowEnd = DeviceClass.lowEnd(app)
     }
 

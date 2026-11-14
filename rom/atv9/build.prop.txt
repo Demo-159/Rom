@@ -4,3 +4,6 @@ ro.product.model=TV
 ro.product.locale=es-CL
 persist.sys.timezone=America/Santiago
 persist.sys.locale=es-CL
+# Output at most 1080p when set to automatic: the Mali-450 draws the menus at the output resolution
+# (this base composes in "real output mode"), and at 4K every screen is slow. 4K TVs scale it up.
+ro.vendor.platform.support.4k=false

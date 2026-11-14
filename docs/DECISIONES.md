@@ -314,3 +314,13 @@ Opciones que se evaluaron:
 - **Precompilación del launcher:** la pide el propio Aerial al sistema (`SelfCompile`).
 - **HDMI-CEC:** queda como viene en la base. Con CEC forzado, la base de fábrica no volvía a prender con el control.
 - **Imagen:** `tools/aml_image_unpack.py` ahora deja cada elemento en su posición original cuando ningún tamaño cambia. Probado byte a byte con la imagen de Aidan y con la de fábrica.
+
+### Optimización a fondo (base Android TV 9)
+
+El usuario notaba todo lento después de horas encendido y no puede hacer pruebas, así que se aplicaron cambios de bajo riesgo:
+- **Salida máximo 1080p** (`ro.vendor.platform.support.4k=false`). Esta base dibuja los menús a la resolución de salida (`realoutputmode`) y la Mali-450 no puede con 4K. Su `hwcomposer` solo acepta "1080" en `vendor.ui_mode`, así que no hay forma de fijar los menús a 720p sin bajar también la salida.
+- **CPU:** el regulador `interactive` sube antes a la velocidad máxima (`go_hispeed_load` 60, `above_hispeed_delay` 20 ms, `min_sample_time` 80 ms, `io_is_busy`).
+- **Memoria interna (eMMC):** planificador `deadline`, lectura anticipada de 512 KB, sin estadísticas de I/O.
+- **Apps en segundo plano:** máximo 16 en caché (`activity_manager_constants`, lo aplica Aerial en el primer arranque).
+- **Aerial:** efectos "Lite" por defecto (`AerialSettings`); se pueden cambiar en Personalizar.
+- **Quitado:** Android TV Core Services (TVRecommendations), que solo alimentaba las recomendaciones del launcher de Google.
