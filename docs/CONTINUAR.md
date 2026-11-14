@@ -31,11 +31,12 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
 
 ## Estado (2026-11-14)
 
-- **Última ROM entregada:** https://gofile.io/d/WQxnye5v (MD5 del zip `827ae935a6df8efb2293945ba56855a8`). No se ha probado en el equipo.
+- **Última ROM entregada:** https://gofile.io/d/jTZhRxRU (MD5 del zip `883c91d1896acb99d80f811961d2c556`). No se ha probado en el equipo.
   - Arreglo del control USB: wakelock del kernel y `KeepAwake` de Aerial como respaldo.
   - Dominio SELinux `tvtune` con los ajustes de CPU, memoria y eMMC.
   - zram con LZ4 y `sys.use_fifo_ui`.
   - Bloqueo de telemetría en `hosts` y ajustes de privacidad.
+  - Android TV Remote Service 5.2, para usar la app Google TV del celular como control.
 - **Última ROM que el usuario confirmó que funciona "casi de maravilla":** https://gofile.io/d/B8vBCL5q. Si la nueva no arranca, volver a esa.
 - **Pendiente de confirmar por el usuario:**
   - Que la ROM nueva arranque. Si no arranca, el sospechoso principal es la política SELinux: `rom/atv9/sepolicy/tvtune.cil`. Para descartarlo, compilar sin `add_tuning`.
