@@ -29,4 +29,7 @@ object RomFlags {
      * powered by the box) can turn the box back on (system/KeepAwake).
      */
     const val KEEP_AWAKE = true
+
+    /** A QR code on Home for the phone remote of the ROM (system/PhoneRemoteHint, rom/remote). */
+    const val PHONE_REMOTE = true
 }

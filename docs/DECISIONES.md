@@ -374,3 +374,17 @@ El usuario notaba todo lento después de horas encendido y no puede hacer prueba
 - **Problema:** el usuario perdió el control. La app Google TV del celular no encontraba el TV box (sí encontraba otro deco de la casa). La base trae Android TV Remote Service 4.1 (2020), y la app usa el protocolo nuevo, que llegó con la versión 5.0 (septiembre de 2021).
 - **Solución:** `rom/prebuilt/AtvRemoteService.apk` (5.2.473254133, mínimo Android 7, sin bibliotecas nativas), enviado por el usuario desde APKMirror. Reemplaza al 4.1 en `priv-app/AtvRemoteService` (`update_remote_service` en `build_rom_atv9.py`) solo si está firmado con la misma clave de Google que el original (comprobado: `456edbc3…9137`). Ninguna de las dos versiones usa `sharedUserId` y la base no exige listas blancas de permisos.
 - **Uso sin control tras flashear:** cable de red al TV box y la app Google TV en un celular conectado al Wi-Fi del mismo router. No está comprobado que responda durante el asistente inicial; el respaldo es un mouse USB.
+
+## Control remoto propio desde el celular (sin Google)
+
+- **Problema:** con el control perdido, la app Google TV no encontraba el TV box ni siquiera con el servicio 5.2, con el equipo en el launcher, por cable y en la misma red. Sin registros no se puede saber por qué, y HDMI-CEC tampoco funcionó con la TV del usuario.
+- **Solución:** `rom/remote/tvremote.c`, un programa nativo estático para ARM de 32 bits. La base usa kernel de 32 bits: su uImage dice `ih_arch=2`. Una versión de 64 bits no habría corrido.
+  - Crea un dispositivo `uinput` ("TV ROM phone remote"). Android lo toma como un teclado o control USB más (`Generic.kl`: flechas, `DPAD_CENTER`, `BACK`, `HOME`, `MENU`, volumen, medios, `POWER`, `ASSIST`, letras y símbolos con distribución US). Funciona en cualquier pantalla, también en el asistente inicial.
+  - Sirve una página en el puerto **8791**, solo para direcciones de red local, con los botones y un campo para enviar texto (claves, correos).
+  - Lo arranca init (`/vendor/etc/init/tvremote.rc`, `class late_start`, como root) en su propio dominio SELinux `tvremote`, **permisivo** (`rom/atv9/sepolicy/tvremote.cil`). Si una regla faltante lo bloqueara, el usuario se quedaría sin forma de manejar el equipo, y no hay forma de ver los registros.
+  - El kernel de la base trae uinput (`drivers/input/misc/uinput.c`) y `ueventd` crea `/dev/uinput`.
+- **Aerial** (`system/PhoneRemoteHint.kt`, `RomFlags.PHONE_REMOTE`) muestra arriba a la derecha de Home un QR con `http://IP:8791/` mientras la página responda, hasta que se presiona la primera tecla.
+- **Pruebas:**
+  - Página, botones y texto: probados en el emulador de Android TV (x86) y bajo qemu ARM.
+  - QR en Home, y que se oculte con la primera tecla: probado en el emulador.
+  - La inyección real de teclas por `uinput` **no** se pudo probar: el emulador no tiene `uinput`. Se revisó que todos los códigos usados tengan traducción en `Generic.kl` de la base.

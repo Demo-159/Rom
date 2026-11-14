@@ -1137,6 +1137,9 @@ fun HomeScreen(
 
         NoticeBanner(vm.notice, Modifier.align(Alignment.TopCenter).padding(top = 24.dp), vm.noticeGlyph)
 
+        // ROM "TV": the phone remote's QR code until the first key press.
+        app.orchard.tv.system.PhoneRemoteHint.Card(Modifier.align(Alignment.TopEnd).padding(end = 40.dp, top = 110.dp))
+
         Screensaver(visible = vm.screensaverVisible, apps = apps, now = now, skips = vm.screensaverSkips, carry = when {
                 filmSaver -> if (Wallpapers.isVideo()) SaverCarry.Video(homeVideo) else SaverCarry.Film(liveFilm)
                 stillCarry != null -> stillCarry

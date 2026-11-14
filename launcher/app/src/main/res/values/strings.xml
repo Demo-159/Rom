@@ -361,4 +361,6 @@
     <string name="cc_quick_about">About</string>
     <string name="keep_awake_channel">Power</string>
     <string name="keep_awake_title">Keeps the USB remote able to turn the box on</string>
+    <string name="phone_remote_title">Use your phone as the remote</string>
+    <string name="phone_remote_hint">Scan with the phone\'s camera, on the same Wi-Fi as the TV, or open:</string>
 </resources>

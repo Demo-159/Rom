@@ -24,7 +24,8 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
 - **Explorador de archivos:** se mantiene el de la base ("Gestor de archivos").
 - **Control remoto:** es **USB** (receptor 2,4 GHz con micrófono). El equipo no debe entrar en suspensión profunda, porque sin energía en los puertos USB el control no lo puede volver a encender.
 - **HDMI-CEC:** dejarlo como viene en la base.
-- **Android TV Remote Service:** se mantiene. El usuario perdió el control y usa la app Google TV del celular como control.
+- **Android TV Remote Service:** se mantiene. El usuario perdió el control.
+- **Control desde el celular:** `rom/remote/tvremote.c` y el QR en Home de Aerial. Página en el puerto 8791 de la IP del TV box; no depende de Google.
 - **Entrega:** un único archivo zip subido a Gofile, con el enlace. El usuario aprobó usar Gofile:
   `curl -F file=@TV-TX3Mini-ATV9.zip https://upload.gofile.io/uploadfile`
 - **"TV en vivo"** (`tvlive/`, reproductor m3u8): **no** va en la ROM, porque el usuario lo pidió así. Se entrega como APK aparte.
@@ -36,7 +37,8 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
   - Dominio SELinux `tvtune` con los ajustes de CPU, memoria y eMMC.
   - zram con LZ4 y `sys.use_fifo_ui`.
   - Bloqueo de telemetría en `hosts` y ajustes de privacidad.
-  - Android TV Remote Service 5.2, para usar la app Google TV del celular como control.
+  - Android TV Remote Service 5.2, para usar la app Google TV del celular como control (no funcionó).
+  - Control remoto propio desde el navegador del celular (`tvremote`) y QR en Home.
 - **Última ROM que el usuario confirmó que funciona "casi de maravilla":** https://gofile.io/d/B8vBCL5q. Si la nueva no arranca, volver a esa.
 - **Pendiente de confirmar por el usuario:**
   - Que la ROM nueva arranque. Si no arranca, el sospechoso principal es la política SELinux: `rom/atv9/sepolicy/tvtune.cil`. Para descartarlo, compilar sin `add_tuning`.
@@ -47,7 +49,7 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
 
 Corre en Linux como root (monta imágenes por loop).
 
-1. **Herramientas:** `simg2img`, `e2fsprogs`, `zerofree`, `secilc`, `unrar`, `abootimg`, Python 3 con Pillow, JDK 17 y el Android SDK (`build-tools` 36.0.0, `platform` 36) en `/home/user/sdk`.
+1. **Herramientas:** `simg2img`, `e2fsprogs`, `zerofree`, `secilc`, `unrar`, `abootimg`, Python 3 con Pillow, `gcc-arm-linux-gnueabihf` (para `rom/remote`), JDK 17 y el Android SDK (`build-tools` 36.0.0, `platform` 36) en `/home/user/sdk`.
 2. **Imagen base (no está en el repositorio, pesa 1,3 GB):**
    - Descargar de MediaFire: https://www.mediafire.com/file/6v21t5bsbunlvh3/
    - Comprobar el MD5 del `.rar`: `381357d804ec789e58b3b40f3825c48c`.

@@ -136,12 +136,20 @@ def add_tuning(vendor):
         0o755, 2000, "u:object_r:tvtune_exec:s0")
     put(os.path.join(src, "etc", "init", "tv_tune.rc"), os.path.join(vendor, "etc", "init", "tv_tune.rc"),
         0o644, 0, "u:object_r:vendor_configs_file:s0")
+    # The phone remote (rom/remote): built from its source, so the image never carries a stale one.
+    b.run(os.path.join(b.ROM, "remote", "build.sh"))
+    put(os.path.join(b.ROM, "remote", "tvremote"), os.path.join(vendor, "bin", "tvremote"),
+        0o755, 2000, "u:object_r:tvremote_exec:s0")
+    put(os.path.join(src, "etc", "init", "tvremote.rc"), os.path.join(vendor, "etc", "init", "tvremote.rc"),
+        0o644, 0, "u:object_r:vendor_configs_file:s0")
     cil = os.path.join(vendor, "etc", "selinux", "vendor_sepolicy.cil")
     with open(cil, "a", encoding="utf-8") as f:
-        f.write("\n" + open(os.path.join(ATV9, "sepolicy", "tvtune.cil"), encoding="utf-8").read())
+        for name in ("tvtune.cil", "tvremote.cil"):
+            f.write("\n" + open(os.path.join(ATV9, "sepolicy", name), encoding="utf-8").read())
     fc = os.path.join(vendor, "etc", "selinux", "vendor_file_contexts")
     with open(fc, "a", encoding="utf-8") as f:
         f.write("/vendor/bin/tv_tune\\.sh\t\tu:object_r:tvtune_exec:s0\n")
+        f.write("/vendor/bin/tvremote\t\tu:object_r:tvremote_exec:s0\n")
 
 
 def check_policy(parts, work, vendor):

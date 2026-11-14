@@ -1,0 +1,18 @@
+; ROM "TV": the phone remote (/vendor/bin/tvremote, rom/remote/tvremote.c): a uinput device and a web
+; page on port 8791 for the local network. Its own domain, permissive: the owner has no other remote,
+; so a denial nobody can see on this box must not leave it unusable. Nothing else runs in it.
+(type tvremote)
+(roletype object_r tvremote)
+(type tvremote_exec)
+(roletype object_r tvremote_exec)
+(typeattributeset domain (tvremote))
+(typeattributeset file_type (tvremote_exec))
+(typeattributeset exec_type (tvremote_exec))
+(typeattributeset vendor_file_type (tvremote_exec))
+(typepermissive tvremote)
+(allow init_28_0 tvremote_exec (file (read getattr map execute open)))
+(allow init_28_0 tvremote (process (transition)))
+(allow tvremote tvremote_exec (file (read getattr map execute entrypoint open)))
+(dontaudit init_28_0 tvremote (process (noatsecure)))
+(allow init_28_0 tvremote (process (siginh rlimitinh)))
+(typetransition init_28_0 tvremote_exec process tvremote)

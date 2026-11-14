@@ -362,4 +362,6 @@
     <string name="cc_quick_about">Acerca de</string>
     <string name="keep_awake_channel">Encendido</string>
     <string name="keep_awake_title">El control USB puede volver a encender el TV box</string>
+    <string name="phone_remote_title">Usa el celular como control</string>
+    <string name="phone_remote_hint">Escanea con la cámara del celular (en el mismo Wi-Fi que el TV) o abre:</string>
 </resources>

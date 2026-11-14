@@ -1,0 +1,6 @@
+# ROM "TV": the phone as the remote (/vendor/bin/tvremote, port 8791; Aerial shows its QR code).
+# From early in the boot, so it also works in the setup wizard; init restarts it if it stops.
+service tvremote /vendor/bin/tvremote
+    class late_start
+    user root
+    group root inet input
