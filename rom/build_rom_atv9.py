@@ -75,6 +75,9 @@ def build_system(parts, work):
         shutil.copy(os.path.join(work, "bootanimation.zip"), anim)
         b.label(anim)
         b.edit_build_prop(os.path.join(sysdir, "build.prop"), os.path.join(ATV9, "build.prop.txt"))
+        # Telemetry hosts blocked (rom/atv9/hosts.txt); the file keeps its owner, mode and label.
+        with open(os.path.join(sysdir, "etc", "hosts"), "a", encoding="utf-8") as f:
+            f.write("\n" + open(os.path.join(ATV9, "hosts.txt"), encoding="utf-8").read())
         b.run("df", "-h", mnt)
     finally:
         b.run("umount", mnt)

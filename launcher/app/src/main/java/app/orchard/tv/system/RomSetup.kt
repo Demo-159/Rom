@@ -33,6 +33,12 @@ object RomSetup {
         secure("backup_enabled", "0")
         // Wi-Fi for Chile: the 5 GHz channels the country allows.
         global("wifi_country_code", "CL")
+        // Privacy: Play Protect keeps checking apps but does not upload unknown ones to Google; no
+        // crash-report prompts; no Wi-Fi "network recommendations" scoring service.
+        global("upload_apk_enable", "0")
+        global("send_action_app_error", "0")
+        global("network_recommendations_enabled", "0")
+        global("wifi_networks_available_notification_on", "0")
         // Fewer apps kept in the background (Android's default is 32): with 2 GB they only fill
         // the compressed memory, and compressing them costs the CPU the menus need.
         global("activity_manager_constants", "max_cached_processes=16")

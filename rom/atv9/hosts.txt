@@ -1,0 +1,15 @@
+# ROM "TV": usage statistics and crash reports that apps send to Google, blocked. Only analytics
+# and crash-reporting hosts: none of them is needed for an app, Google sign-in or the Play Store
+# to work (the apps' own Firebase/Crashlytics libraries give up silently).
+0.0.0.0 app-measurement.com
+0.0.0.0 www.app-measurement.com
+0.0.0.0 google-analytics.com
+0.0.0.0 www.google-analytics.com
+0.0.0.0 ssl.google-analytics.com
+0.0.0.0 analytics.google.com
+0.0.0.0 firebaselogging.googleapis.com
+0.0.0.0 firebaselogging-pa.googleapis.com
+0.0.0.0 crashlyticsreports-pa.googleapis.com
+0.0.0.0 settings.crashlytics.com
+0.0.0.0 reports.crashlytics.com
+0.0.0.0 e.crashlytics.com

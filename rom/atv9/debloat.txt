@@ -15,3 +15,5 @@ system/priv-app/SetOrientation
 system/app/BugReportSender
 system/app/GoogleCalendarSyncAdapter
 system/app/GoogleContactsSyncAdapter
+# Phone-as-remote service (Google TV app): always listening on the network; the box has its own remote.
+system/priv-app/AtvRemoteService
