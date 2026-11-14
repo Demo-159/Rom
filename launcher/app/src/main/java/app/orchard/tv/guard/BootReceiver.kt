@@ -38,6 +38,8 @@ class BootReceiver : BroadcastReceiver() {
 
     private fun onBoot(context: Context, action: String) {
         GuardSetup.ensureEnabled(context)
+        // ROM "TV": no deep sleep, so the USB remote can turn the box back on.
+        app.orchard.tv.system.KeepAwake.start(context)
         if (action == Intent.ACTION_LOCKED_BOOT_COMPLETED) return
         GuardSetup.rescanIfMissing(context)
         // Also when Aerial is the default Home: some firmwares start their own launcher at boot

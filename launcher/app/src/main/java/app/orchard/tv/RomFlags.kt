@@ -23,4 +23,10 @@ object RomFlags {
      * update from upstream would replace it and lose the ROM's changes.
      */
     const val UPDATES = false
+
+    /**
+     * The power button turns the picture off without deep sleep, so a USB remote (its receiver
+     * powered by the box) can turn the box back on (system/KeepAwake).
+     */
+    const val KEEP_AWAKE = true
 }

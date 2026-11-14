@@ -337,3 +337,10 @@ El usuario notaba todo lento después de horas encendido y no puede hacer prueba
 
 - **Pedido:** una app para ver archivos y pendrives.
 - **Decisión:** se mantiene el explorador que trae la base (`MiFileExplorer`, paquete `com.anker.fileexplorer`), que antes se quitaba. Está hecho para TV, aparece en el launcher como "Gestor de archivos", abre memorias USB y puede instalar APKs.
+
+## Botón de encendido con el control USB
+
+- **Problema:** el botón apaga el TV box y después no lo vuelve a encender. Pasaba con la ROM de base de fábrica y con la de Android TV 9.
+- **Causa probable:** el control del usuario es USB, con un receptor de 2,4 GHz y micrófono. En suspensión profunda el S905W deja sin energía los puertos USB, así que el receptor no puede despertar al equipo. Un control infrarrojo sí lo despertaría, porque eso lo maneja el procesador de bajo consumo.
+- **Solución:** Aerial (`system/KeepAwake.kt`, `RomFlags.KEEP_AWAKE`) mantiene un wakelock parcial desde un servicio en primer plano, que arranca al encender y al abrir Home. El botón apaga la imagen, pero el kernel no entra en suspensión, el control USB sigue con energía y su botón de encendido vuelve a prender la pantalla. Con la pantalla apagada la CPU queda en su velocidad mínima: consume algo más que en suspensión profunda, pero poco.
+- **Por qué en Aerial:** en esta base, init solo puede cambiar atributos de `/sys/power/wake_lock` (`setattr`), no escribir en él. `system_server` sí puede, y lo hace por las apps.

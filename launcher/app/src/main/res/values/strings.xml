@@ -359,4 +359,6 @@
     <string name="cc_quick_apps">Apps</string>
     <string name="cc_quick_storage">Storage</string>
     <string name="cc_quick_about">About</string>
+    <string name="keep_awake_channel">Power</string>
+    <string name="keep_awake_title">Keeps the USB remote able to turn the box on</string>
 </resources>

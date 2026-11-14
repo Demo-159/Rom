@@ -279,6 +279,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) { SelfCompile.init(this@MainActivity) }
         // ROM "TV": the system settings the ROM starts with, once after a flash.
         lifecycleScope.launch(Dispatchers.IO) { app.orchard.tv.system.RomSetup.firstBoot(this@MainActivity) }
+        app.orchard.tv.system.KeepAwake.start(this)
         CustomIcons.init(this)
         IconLibrary.init(this)
         SourceLooks.init(this)

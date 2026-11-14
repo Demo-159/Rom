@@ -360,4 +360,6 @@
     <string name="cc_quick_apps">Aplicaciones</string>
     <string name="cc_quick_storage">Almacenamiento</string>
     <string name="cc_quick_about">Acerca de</string>
+    <string name="keep_awake_channel">Encendido</string>
+    <string name="keep_awake_title">El control USB puede volver a encender el TV box</string>
 </resources>
