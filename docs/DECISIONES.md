@@ -292,3 +292,25 @@ Opciones que se evaluaron:
 - **El Wi-Fi no funcionaba:** los módulos del kernel recortados con `strip` no cargaban (`Failed to insmod 9012`). Los módulos quedan como vienen de fábrica.
 - **Por precaución,** `usbpm` e `imageserver` (servicios de Amlogic) vuelven a arrancar.
 - **No arrancaba con Magisk:** ver la sección de root; se quitó.
+
+## Cambio de base: Aidan's ROM v9 (Android TV 9)
+
+- **Decisión del usuario:** usar como base *[v9] Aidan's ROM (TX3 Mini) [S905W] [ATV9] (ap6330 & 9012p)*, que ya funciona en su TV box. Descargada desde MediaFire; MD5 `381357d804ec789e58b3b40f3825c48c`, igual al publicado en AndroidFileHost.
+- **Por qué es mejor base:** es Android TV 9 de verdad, con Play Store de TV, servicios de Google para TV, asistente de inicio de sesión de Android TV (SetupWraith), búsqueda por voz (Katniss) y Configuración de Android TV. Lo que en la base de fábrica (Android 7.1) había que parchar ya viene.
+- **Seguridad de la base:** la verificación de arranque está desactivada en su `vbmeta` (flags 2) y su fstab no usa verity, así que `system` y `vendor` se pueden modificar. El `boot.img` no se toca.
+- **Script:** `rom/build_rom_atv9.py` (reutiliza las funciones de `rom/build_rom.py`). Archivos en `rom/atv9/`.
+- **Quitado** (`rom/atv9/debloat.txt`): Android TV Home, su personalizador y App Drawer (Aerial es el único launcher), los protectores de pantalla Dreamx, Mi Wallpaper Carousel y Backdrop (unos 75 MB), Cámara, Live Channels, explorador de archivos de Xiaomi, SetOrientation, BugReportSender y la sincronización de Calendario y Contactos.
+- **Agregado:** Aerial (priv-app), TizenTube como "YouTube", el puente de voz `YouTubeBridge`, la animación de puntos y el logo negro.
+- **Marca blanca:** `ro.product.model`, `ro.product.vendor.model` y `ro.build.display.id` pasan a "TV". La huella (`ro.build.fingerprint`), el nombre y el dispositivo se mantienen, porque la certificación de Google Play depende de ellos.
+- **Idioma y zona:** es-CL, America/Santiago.
+- **Memoria:** zram de 256 a 512 MB; swappiness 100 y page-cluster 0 con comandos `write` de init (`/system/etc/init/tv_tune.rc`). Es una compilación "user" con SELinux activo, así que un script propio arrancado por init no tendría dominio donde correr.
+- **Ajustes del primer arranque:** los aplica Aerial una sola vez (`system/RomSetup.kt`), porque es app privilegiada del sistema:
+  - animaciones a 0.5;
+  - ubicación apagada;
+  - búsqueda de Wi-Fi y Bluetooth en segundo plano apagada;
+  - respaldo apagado;
+  - Wi-Fi con país Chile;
+  - suspensión a las 3 horas.
+- **Precompilación del launcher:** la pide el propio Aerial al sistema (`SelfCompile`).
+- **HDMI-CEC:** queda como viene en la base. Con CEC forzado, la base de fábrica no volvía a prender con el control.
+- **Imagen:** `tools/aml_image_unpack.py` ahora deja cada elemento en su posición original cuando ningún tamaño cambia. Probado byte a byte con la imagen de Aidan y con la de fábrica.

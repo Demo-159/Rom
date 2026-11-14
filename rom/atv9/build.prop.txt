@@ -1,0 +1,6 @@
+# ROM "TV" on Aidan's ROM v9: white label "TV", Chile. The fingerprint stays (Play certification).
+ro.build.display.id=TV
+ro.product.model=TV
+ro.product.locale=es-CL
+persist.sys.timezone=America/Santiago
+persist.sys.locale=es-CL

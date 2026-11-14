@@ -40,7 +40,12 @@ def fetch(url, dest):
 
 
 def label(path):
-    """Owner, mode and SELinux label as the build system gives /system files."""
+    """Owner, mode and SELinux label as the build system gives /system files (a file or a folder)."""
+    if os.path.isfile(path):
+        os.chown(path, 0, 0)
+        os.chmod(path, 0o644)
+        run("setfattr", "-n", "security.selinux", "-v", SYSTEM_FILE, path)
+        return
     for base, dirs, files in os.walk(path):
         for n in [base] + [os.path.join(base, f) for f in files]:
             os.chown(n, 0, 0)

@@ -19,7 +19,7 @@ def unpack(img, out):
             f.seek(off); data = f.read(sz)
             open(os.path.join(out, name), 'wb').write(data)
             meta['items'].append(dict(id=iid, file_type=ft, main=main, sub=sub, verify=verify,
-                                      is_backup=isbak, backup_id=bakid, file=name, size=sz))
+                                      is_backup=isbak, backup_id=bakid, file=name, size=sz, offset=off))
             print(f'{iid:2d} {ft} {main:8s} {sub:20s} {sz:>12,d}')
         json.dump(meta, open(os.path.join(out, 'image.json'), 'w'), indent=1)
 
@@ -28,6 +28,9 @@ def repack(src, img):
     items, align = meta['items'], meta['align']
     n = len(items)
     off = HDR.size + ITEM.size * n
+    # Every item the size it had: each goes back where it was, so the image differs from the
+    # original only in the bytes that changed (packers differ in how they align small items).
+    keep = all('offset' in it and os.path.getsize(os.path.join(src, it['file'])) == it['size'] for it in items)
     with open(img, 'wb') as o:
         o.write(b'\0' * off)
         table, offsets = [], []
@@ -35,6 +38,9 @@ def repack(src, img):
             data = open(os.path.join(src, it['file']), 'rb').read()
             if it['is_backup']:  # shares data with another item
                 ioff = offsets[it['backup_id']]
+            elif keep:
+                ioff = it['offset']
+                o.seek(ioff); o.write(data); off = max(off, ioff + len(data))
             else:
                 off = (off + align - 1) // align * align
                 o.seek(off); o.write(data); ioff = off; off += len(data)

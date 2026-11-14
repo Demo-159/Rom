@@ -277,6 +277,8 @@ class MainActivity : ComponentActivity() {
         Weather.init(this)
         Updates.init(this)
         lifecycleScope.launch(Dispatchers.IO) { SelfCompile.init(this@MainActivity) }
+        // ROM "TV": the system settings the ROM starts with, once after a flash.
+        lifecycleScope.launch(Dispatchers.IO) { app.orchard.tv.system.RomSetup.firstBoot(this@MainActivity) }
         CustomIcons.init(this)
         IconLibrary.init(this)
         SourceLooks.init(this)
