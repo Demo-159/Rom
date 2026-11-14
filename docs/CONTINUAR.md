@@ -24,6 +24,7 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
 - **Explorador de archivos:** se mantiene el de la base ("Gestor de archivos").
 - **Control remoto:** es **USB** (receptor 2,4 GHz con micrófono). El equipo no debe entrar en suspensión profunda, porque sin energía en los puertos USB el control no lo puede volver a encender.
 - **HDMI-CEC:** dejarlo como viene en la base.
+- **Android TV Remote Service:** se mantiene. El usuario perdió el control y usa la app Google TV del celular como control.
 - **Entrega:** un único archivo zip subido a Gofile, con el enlace. El usuario aprobó usar Gofile:
   `curl -F file=@TV-TX3Mini-ATV9.zip https://upload.gofile.io/uploadfile`
 - **"TV en vivo"** (`tvlive/`, reproductor m3u8): **no** va en la ROM, porque el usuario lo pidió así. Se entrega como APK aparte.
@@ -34,7 +35,7 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
   - Arreglo del control USB: wakelock del kernel y `KeepAwake` de Aerial como respaldo.
   - Dominio SELinux `tvtune` con los ajustes de CPU, memoria y eMMC.
   - zram con LZ4 y `sys.use_fifo_ui`.
-  - Bloqueo de telemetría en `hosts`, ajustes de privacidad y sin Android TV Remote Service.
+  - Bloqueo de telemetría en `hosts` y ajustes de privacidad.
 - **Última ROM que el usuario confirmó que funciona "casi de maravilla":** https://gofile.io/d/B8vBCL5q. Si la nueva no arranca, volver a esa.
 - **Pendiente de confirmar por el usuario:**
   - Que la ROM nueva arranque. Si no arranca, el sospechoso principal es la política SELinux: `rom/atv9/sepolicy/tvtune.cil`. Para descartarlo, compilar sin `add_tuning`.

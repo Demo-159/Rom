@@ -365,6 +365,6 @@ El usuario notaba todo lento después de horas encendido y no puede hacer prueba
   - `upload_apk_enable=0`: Play Protect sigue revisando las apps, pero no sube a Google las desconocidas.
   - `send_action_app_error=0`: sin informes de fallos.
   - `network_recommendations_enabled=0` y `wifi_networks_available_notification_on=0`.
-- **Quitado:** Android TV Remote Service (usar el celular como control). Deja un servicio escuchando siempre en la red y el usuario usa su control USB.
+- **Android TV Remote Service:** se quitó y luego se **devolvió**. El usuario perdió el control y la app Google TV del celular funciona como control a través de este servicio. No volver a quitarlo.
 - **No se tocó** `miracast_hdcp2`: está declarado en el manifiesto VINTF y quien lo pida esperaría para siempre (la misma lección que `cameraserver`). Tampoco se tocaron los servicios de Amlogic, porque casi todos ya están `disabled`/`oneshot` y solo arrancan a pedido.
 - **Límites reales:** casi toda la RAM la usan los servicios de Google, la Play Store, la búsqueda por voz y Gboard, que el usuario quiere conservar. El tiempo de arranque es sobre todo kernel, Zygote y revisión de paquetes; no hay más palancas seguras sin tocar `boot.img`.
