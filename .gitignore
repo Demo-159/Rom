@@ -7,6 +7,7 @@ apk/
 launcher/local.properties
 launcher/.gradle/
 launcher/build/
+launcher/out/
 launcher/app/build/
 launcher/local/
 __pycache__/
