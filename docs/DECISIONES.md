@@ -392,3 +392,10 @@ El usuario notaba todo lento después de horas encendido y no puede hacer prueba
   - Página, botones y texto: probados en el emulador de Android TV (x86) y bajo qemu ARM.
   - QR en Home, y que se oculte con la primera tecla: probado en el emulador.
   - La inyección real de teclas por `uinput` **no** se pudo probar: el emulador no tiene `uinput`. Se revisó que todos los códigos usados tengan traducción en `Generic.kl` de la base.
+
+## Clave de firma fija para Aerial
+
+- **Problema:** Aerial 1.97 no se pudo instalar como actualización del 1.96 de la ROM. Cada sesión firmaba con su propia clave de depuración, que se pierde al terminar la sesión, y Android rechaza una actualización firmada con otra clave. Como Aerial es una app del sistema, tampoco se puede desinstalar para poner el nuevo.
+- **Decisión:** una clave fija, `launcher/signing/aerial.jks`, guardada **en el repositorio** por pedido del usuario. La compilación de Aerial falla si no la encuentra. Detalles y reglas en `docs/CONTINUAR.md` (*Clave de firma de Aerial*).
+- **Alternativa descartada:** que el usuario guardara la clave y la entregara en cada sesión. Es más segura, pero fácil de perder.
+- **Consecuencia:** hace falta flashear una ROM nueva una sola vez. Las versiones siguientes de Aerial se instalan como APK.

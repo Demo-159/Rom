@@ -30,7 +30,7 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
   `curl -F file=@TV-TX3Mini-ATV9.zip https://upload.gofile.io/uploadfile`
 - **"TV en vivo"** (`tvlive/`, reproductor m3u8): **no** va en la ROM, porque el usuario lo pidió así. Se entrega como APK aparte.
 
-## Estado (2026-11-14)
+## Estado (2026-11-16)
 
 - **Última ROM entregada:** https://gofile.io/d/LTwU8dPg (MD5 del zip `aca08c3cd6e5af1a06a7caafce69b423`). No se ha probado en el equipo.
   - Arreglo del control USB: wakelock del kernel y `KeepAwake` de Aerial como respaldo.
@@ -40,6 +40,7 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
   - Android TV Remote Service 5.2, para usar la app Google TV del celular como control (no funcionó).
   - Control remoto propio desde el navegador del celular (`tvremote`) y QR en Home.
 - **Última ROM que el usuario confirmó que funciona "casi de maravilla":** https://gofile.io/d/B8vBCL5q. Si la nueva no arranca, volver a esa.
+- **Aerial 1.97** (sonidos más suaves, con volumen elegible) está en el repositorio y se firmará con la clave fija (ver *Clave de firma de Aerial*). No se puede instalar sobre la ROM del 2026-11-14: necesita una ROM nueva. **La ROM nueva aún no se arma:** el usuario pidió esperar.
 - **Pendiente de confirmar por el usuario:**
   - Que la ROM nueva arranque. Si no arranca, el sospechoso principal es la política SELinux: `rom/atv9/sepolicy/tvtune.cil`. Para descartarlo, compilar sin `add_tuning`.
   - Que el control USB vuelva a encender el equipo.
@@ -54,7 +55,7 @@ Corre en Linux como root (monta imágenes por loop).
    - Descargar de MediaFire: https://www.mediafire.com/file/6v21t5bsbunlvh3/
    - Comprobar el MD5 del `.rar`: `381357d804ec789e58b3b40f3825c48c`.
    - Extraer con `unrar`. `7z` y `unar` fallan con este RAR5.
-3. **Compilar Aerial:** `cd launcher && ./gradlew assembleStandardRelease`.
+3. **Compilar Aerial:** `cd launcher && ./gradlew assembleStandardRelease`. Firma con `launcher/signing/aerial.jks`.
 4. **Armar la ROM:**
    `sudo python3 rom/build_rom_atv9.py AIDAN.img OUT.img`
    El script hace todo esto:
@@ -66,11 +67,21 @@ Corre en Linux como root (monta imágenes por loop).
    - Pone el logo en negro y recalcula los VERIFY.
 5. **Verificar:** sumas VERIFY, CRC de la imagen, etiquetas SELinux y que solo cambien `system`, `vendor` y `logo` (ver los historiales de commits). `tools/aml_image_unpack.py` rearma la imagen de Aidan idéntica byte a byte.
 
+## Clave de firma de Aerial
+
+- **Dónde está:** `launcher/signing/aerial.jks`, con sus contraseñas en `launcher/signing/signing.properties`. Están en el repositorio a propósito: el usuario lo pidió así (2026-11-16).
+- **Huella SHA-256 del certificado:** `CA:72:68:FC:2B:C7:34:25:AF:A2:E2:19:81:FE:58:53:19:63:9B:F9:9D:AC:45:B2:5B:45:42:FF:B6:8C:41:6A`.
+- **Para qué sirve:** Android solo acepta una actualización de Aerial firmada con la misma clave que la copia instalada. Con esta clave fija, un APK nuevo de Aerial se instala encima del que trae la ROM, sin volver a flashear.
+- **Reglas:**
+  - **No borrarla, no cambiarla y no regenerarla.** Si se pierde, ningún APK nuevo de Aerial podrá actualizar el de la ROM, y habrá que entregar otra ROM.
+  - `launcher/app/build.gradle.kts` firma con ella y **falla** si no la encuentra. Antes caía en la clave de depuración de la máquina.
+  - Comprobar la firma de un APK antes de entregarlo: `apksigner verify --print-certs app-standard-release.apk`. Tiene que mostrar la huella de arriba.
+- **Historial:** la ROM entregada el 2026-11-14 (Aerial 1.96) se firmó con la clave de depuración de esa sesión, que se perdió. Por eso el usuario no pudo instalar Aerial 1.97 encima. Con esa ROM no hay arreglo posible: hay que flashear la primera ROM firmada con esta clave. Desde esa ROM, Aerial ya se actualiza con APK.
+- **Riesgo aceptado:** quien tenga acceso al repositorio puede firmar un Aerial que el TV box aceptaría como actualización.
+
 ## Lo que solo existía en la máquina de esta sesión
 
-- **Clave de firma de Aerial, YouTubeBridge y TV en vivo:** es la clave de depuración de esa máquina, `~/.android/debug.keystore`. Una sesión nueva genera otra clave.
-  - **Lo que afecta:** una ROM nueva instala bien, pero no se puede actualizar un Aerial ya instalado con un APK firmado con otra clave.
-  - **Si importa:** pedirle al usuario que guarde esa clave, o firmar desde ahora con una clave fija guardada fuera del repositorio.
+- **Clave de depuración de YouTubeBridge y TV en vivo:** es la de la máquina de cada sesión (`~/.android/debug.keystore`), así que una sesión nueva firma con otra. Para Aerial ya no es así: ver *Clave de firma de Aerial*.
 - **Claves de prueba de AOSP** (`platform`, `testkey`): se vuelven a bajar de android.googlesource.com (rama nougat-mr2-release, `build/target/product/security`). Solo las usaba la base 7.1.
 - **Imágenes base:**
   - La de Aidan: ver el paso 2.

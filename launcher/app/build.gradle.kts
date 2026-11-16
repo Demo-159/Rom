@@ -51,15 +51,16 @@ android {
         }
     }
 
-    // The TVs only accept updates signed with the key Aerial was first installed with. That key
-    // lives outside version control in local/ (see docs/HANDOFF.md); without it the build falls
-    // back to this machine's debug key, which installs fresh but cannot update existing copies.
-    val signingProps = rootProject.file("local/signing.properties")
+    // The TV box only accepts updates signed with the key Aerial was first installed with. The ROM's
+    // key is committed in signing/ (see docs/CONTINUAR.md, "Clave de firma de Aerial"). A release
+    // build without it fails rather than fall back to a per-machine debug key, which would produce
+    // an APK that cannot update the copy in the ROM.
+    val signingProps = rootProject.file("signing/signing.properties")
     signingConfigs {
         if (signingProps.exists()) {
             val p = Properties().apply { signingProps.inputStream().use { load(it) } }
             create("aerial") {
-                storeFile = rootProject.file("local/" + p.getProperty("storeFile"))
+                storeFile = rootProject.file("signing/" + p.getProperty("storeFile"))
                 storePassword = p.getProperty("storePassword")
                 keyAlias = p.getProperty("keyAlias")
                 keyPassword = p.getProperty("keyPassword")
@@ -72,7 +73,8 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.findByName("aerial") ?: signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("aerial")
+                ?: throw GradleException("Missing launcher/signing/signing.properties: the ROM's Aerial key")
         }
     }
 
