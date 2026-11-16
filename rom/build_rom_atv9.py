@@ -10,7 +10,7 @@ vendor images can change; the boot image is left as it is.
 Needs root (loop mount), e2fsck, tune2fs, zerofree, setfattr and Python 3 with Pillow.
 Usage: sudo python3 rom/build_rom_atv9.py AIDAN.img OUT.img
 """
-import os, shutil, subprocess, sys, tempfile
+import os, re, shutil, subprocess, sys, tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_rom as b  # noqa: E402  (the stock-based build's helpers)
@@ -84,6 +84,7 @@ def build_system(parts, work):
         # results to TizenTube.
         b.install_app(sysdir, "app/YouTubeBridge", os.path.join(b.ROM, "prebuilt", "YouTubeBridge.apk"), extract_libs=False)
         copy_tree(os.path.join(ATV9, "overlay"), root)
+        power_key_toggles(os.path.join(sysdir, "usr", "keylayout"))
         b.run(sys.executable, os.path.join(b.ROM, "tools", "make_bootanim.py"), work)
         anim = os.path.join(sysdir, "media", "bootanimation.zip")
         shutil.copy(os.path.join(work, "bootanimation.zip"), anim)
@@ -113,11 +114,35 @@ def build_vendor(parts, work):
         text = open(fstab, encoding="utf-8").read()
         assert "zramsize=268435456" in text, "zram line not as expected"
         open(fstab, "w", encoding="utf-8").write(text.replace("zramsize=268435456", "zramsize=536870912"))
+        power_key_toggles(os.path.join(mnt, "usr", "keylayout"))
         add_tuning(mnt)
         check_policy(parts, work, mnt)
     finally:
         b.run("umount", mnt)
     finish_ext4(raw)
+
+
+def power_key_toggles(keylayout):
+    """USB remotes whose power button sends KEY_SLEEP (142, HID "System Sleep"): Android can only put
+    the box to sleep with SLEEP, never wake it, so the same button could turn the box off but not
+    on again. As POWER it does both, as the base already maps it for some remotes
+    (Vendor_1220_Product_0008.kl: "key 142 POWER WAKE"). KEY_POWER2 (356), commented out in the base,
+    becomes POWER too. Files are rewritten in place: owner, mode and SELinux label stay."""
+    changed = 0
+    for name in sorted(os.listdir(keylayout)):
+        if not name.endswith(".kl"):
+            continue
+        path = os.path.join(keylayout, name)
+        text = open(path, encoding="utf-8").read()
+        new = re.sub(r"(?m)^key\s+142\s+SLEEP\b.*$", "key 142   POWER", text)
+        if name == "Generic.kl":
+            new = re.sub(r'(?m)^#\s*key\s+356\s+"KEY_POWER2".*$', "key 356   POWER", new)
+        if new != text:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(new)
+            changed += 1
+    assert changed, "no key layout with KEY_SLEEP found in " + keylayout
+    print("  power key toggles in", changed, "key layouts of", keylayout, flush=True)
 
 
 def put(src, dst, mode, gid, context):

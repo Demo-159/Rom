@@ -43,7 +43,7 @@ ROM "TV" para el **Tanix TX3 Mini** (Amlogic S905W, placa p281, 2 GB de RAM) del
 - **Aerial 1.97** (sonidos más suaves, con volumen elegible) está en el repositorio y se firmará con la clave fija (ver *Clave de firma de Aerial*). No se puede instalar sobre la ROM del 2026-11-14: necesita una ROM nueva. **La ROM nueva aún no se arma:** el usuario pidió esperar.
 - **Pendiente de confirmar por el usuario:**
   - Que la ROM nueva arranque. Si no arranca, el sospechoso principal es la política SELinux: `rom/atv9/sepolicy/tvtune.cil`. Para descartarlo, compilar sin `add_tuning`.
-  - Que el control USB vuelva a encender el equipo.
+  - Que el control USB vuelva a encender el equipo. **Con la ROM del 2026-11-14 no lo hace** (el botón apaga, pero no enciende). La ROM siguiente agrega `power_key_toggles` (ver *Botón de encendido con el control USB* en `docs/DECISIONES.md`).
   - Que se sienta más rápido.
 
 ## Cómo reconstruir
