@@ -105,29 +105,38 @@ object Sounds {
     private enum class Kind { Move, Select, Back, Limit }
 
     /**
-     * The volume form, with the key sound switch checked here as the one-argument form does: Hisense
-     * VIDAA_TV (MT9653, Android 11) changed that one to take only its own effects (10 to 18), so the
-     * standard ones played nothing (issue #262). -1 is the volume the one-argument form uses.
+     * ROM "TV": the system's key sound switch (Ajustes > Sonido > Sonidos del sistema) silences both
+     * sets, not just the TV's own, so turning it off anywhere turns Aerial's sounds off too.
+     */
+    private fun systemSoundsOn(): Boolean {
+        val context = app ?: return true
+        return runCatching { Settings.System.getInt(context.contentResolver, Settings.System.SOUND_EFFECTS_ENABLED, 1) != 0 }
+            .getOrDefault(true)
+    }
+
+    /**
+     * The volume form: Hisense VIDAA_TV (MT9653, Android 11) changed the one-argument form to take
+     * only its own effects (10 to 18), so the standard ones played nothing (issue #262). AudioService
+     * plays -1 at -6 dB (0.5), so the chosen level is a share of that.
      */
     private fun playTvEffect(effect: Int) {
-        val context = app ?: return
-        val on = runCatching { Settings.System.getInt(context.contentResolver, Settings.System.SOUND_EFFECTS_ENABLED, 1) != 0 }
-            .getOrDefault(true)
-        if (on) audio?.playSoundEffect(effect, -1f)
+        audio?.playSoundEffect(effect, 0.5f * AerialSettings.soundVolume.gain)
     }
 
     private fun play(effect: Int, kind: Kind) {
+        if (!systemSoundsOn()) return
         when (AerialSettings.uiSounds) {
             UiSounds.Off -> Unit
             UiSounds.Tv -> playTvEffect(effect)
             UiSounds.Aerial -> {
                 val p = ownPool() ?: return
-                val (id, volume) = when (kind) {
+                val (id, base) = when (kind) {
                     Kind.Move -> move to 0.7f
                     Kind.Select -> select to 1f
                     Kind.Back -> back to 0.9f
                     Kind.Limit -> limit to 0.9f
                 }
+                val volume = base * AerialSettings.soundVolume.gain
                 if (id != 0) p.play(id, volume, volume, 1, 0, 1f)
             }
         }

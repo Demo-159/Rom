@@ -194,6 +194,10 @@ El detalle está en la sección 3.
 
 El launcher del fabricante (`Oranth_Launcher_720P`) se reemplaza.
 
+### Sonidos de la interfaz (aplicado)
+- **Problema:** el sonido al desplazarse era molesto, y seguía sonando aunque se apagaran los sonidos del sistema en Ajustes u otra app. En Android TV todos los volúmenes van ligados al de multimedia, así que no se puede bajar solo el de los efectos.
+- **Decisión:** Aerial tiene su propio *Volumen de los sonidos* (Bajo, Medio o Alto; **Bajo** por defecto) en Personalización. Además, el interruptor *Sonidos del sistema* de Android silencia los dos juegos de sonidos (TV y Aerial), no solo el de la TV.
+
 ### Optimización de RAM del launcher (aplicada)
 Medido en el emulador de Android TV 7.1: Aerial usa **~45 MB** (PSS) en el inicio, frente a ~30 MB del launcher de Android TV. Cambios hechos sin alterar lo que se ve:
 1. **Mosaicos al tamaño real:** las imágenes de cada app se guardan al tamaño en píxeles del mosaico seleccionado (235 px de ancho en 720p) en vez de un mínimo fijo de 352 px. Son ~55 % menos de memoria por app.

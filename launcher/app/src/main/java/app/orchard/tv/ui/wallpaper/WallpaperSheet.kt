@@ -75,6 +75,7 @@ import app.orchard.tv.settings.ClockHours
 import app.orchard.tv.settings.Restricted
 import app.orchard.tv.settings.RestrictedKind
 import app.orchard.tv.settings.FocusStyle
+import app.orchard.tv.settings.SoundVolume
 import app.orchard.tv.settings.UiSounds
 import app.orchard.tv.settings.Effects
 import app.orchard.tv.system.Sounds
@@ -308,6 +309,13 @@ fun WallpaperSheet(
                         listOf(UiSounds.Tv to R.string.st_sounds_tv, UiSounds.Aerial to R.string.st_sounds_aerial, UiSounds.Off to R.string.st_off),
                         AerialSettings.uiSounds, { AerialSettings.chooseUiSounds(it); Sounds.prepare() },
                     )
+                    if (AerialSettings.uiSounds != UiSounds.Off) {
+                        Choices(
+                            R.string.st_sounds_volume, stringResource(R.string.st_sounds_volume_hint), note,
+                            listOf(SoundVolume.Low to R.string.st_sounds_volume_low, SoundVolume.Medium to R.string.st_sounds_volume_medium, SoundVolume.High to R.string.st_sounds_volume_high),
+                            AerialSettings.soundVolume, { AerialSettings.chooseSoundVolume(it); Sounds.select() },
+                        )
+                    }
                     Choices(
                         R.string.st_effects,
                         stringResource(

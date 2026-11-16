@@ -41,6 +41,15 @@ enum class UiSounds(val key: String) {
     }
 }
 
+/** ROM "TV": how loud the interface sounds play, as a share of the TV's own effect volume. */
+enum class SoundVolume(val key: String, val gain: Float) {
+    Low("low", 0.25f), Medium("medium", 0.5f), High("high", 1f);
+
+    companion object {
+        fun of(key: String?) = entries.firstOrNull { it.key == key }
+    }
+}
+
 /**
  * How much of the interface's light and motion to draw. Full is the glass panels, a focused tile's
  * sheen, parallax and shadow, and the panel's highest refresh rate. Lite draws the panels in plain
@@ -135,6 +144,9 @@ object AerialSettings {
 
     /** Interface sounds (system/Sounds), as tvOS plays them on every press. */
     var uiSounds by mutableStateOf(UiSounds.Tv); private set
+
+    /** ROM "TV": quiet by default; the full level was too loud on every move. */
+    var soundVolume by mutableStateOf(SoundVolume.Low); private set
 
     const val DAY_MINUTES = 1440
     /** The choices for [photoMinutes]: a day, an hour, 15, 5 and 1 minutes. */
@@ -265,6 +277,7 @@ object AerialSettings {
             Settings.System.getInt(app.contentResolver, Settings.System.SOUND_EFFECTS_ENABLED, 1) == 1 -> UiSounds.Tv
             else -> UiSounds.Aerial
         }
+        soundVolume = SoundVolume.of(prefs.getString("ui_sounds_volume", null)) ?: SoundVolume.Low
         backStartsScreensaver = prefs.getBoolean("back_starts_screensaver", true)
         screensaverMinutes = prefs.getInt("screensaver_minutes", DEFAULT_SCREENSAVER_MINUTES)
         aerialQuality = AerialQuality.of(prefs.getString("aerial_quality", null))
@@ -334,6 +347,11 @@ object AerialSettings {
     fun chooseUiSounds(kind: UiSounds) {
         uiSounds = kind
         app.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit { putString("ui_sounds_kind", kind.key) }
+    }
+
+    fun chooseSoundVolume(volume: SoundVolume) {
+        soundVolume = volume
+        app.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit { putString("ui_sounds_volume", volume.key) }
     }
 
     fun chooseHomePlate(on: Boolean) {
