@@ -10,5 +10,21 @@ on post-fs-data
     # vendor's swapon_all (at boot_completed), as the algorithm cannot change once zram is in use.
     write /sys/block/zram0/comp_algorithm lz4
 
+# The USB remote can only turn the box back on if the box never goes into deep sleep: there the
+# S905W cuts the 3.3 V supply ("power off vddio_3v3" in the kernel) and only infrared, the box's
+# button or HDMI-CEC can wake it, never USB. Android (libsuspend in system_server, user "system")
+# sends the box to deep sleep by writing "mem" to /sys/power/state, which the base's init.rc gives
+# to "system" on boot. Taken back here, read-only and root's: system_server can no longer suspend
+# the box, whatever wake locks there are. The power button still turns the picture off (that path,
+# early_suspend_trigger, is another file). Runs after the base's "on boot", and once more at the
+# end of the boot in case something changed it back.
+on boot
+    chown root root /sys/power/state
+    chmod 0444 /sys/power/state
+    chown root root /sys/power/autosleep
+    chmod 0444 /sys/power/autosleep
+
 on property:sys.boot_completed=1
+    chown root root /sys/power/state
+    chmod 0444 /sys/power/state
     start tv_tune
